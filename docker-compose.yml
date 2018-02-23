@@ -1,0 +1,62 @@
+version: "3.3"
+services:
+    web:
+        build:
+            context: ./web
+            dockerfile: web.Dockerfile
+        env_file:
+            - .env
+        ports:
+            - ${PORT_INSECURE}:${PORT_INSECURE}
+            - ${PORT_SECURE}:${PORT_SECURE}
+        depends_on:
+            - db
+            - mongo-express
+        restart: on-failure
+        volumes:
+            - ./web:/usr/src/app
+
+    mongo-express:
+        image: mongo-express:0.42
+        ports:
+            - ${PORT_MONGO_EXPRESS}:${PORT_MONGO_EXPRESS}
+        depends_on:
+            - db
+        restart: on-failure
+        environment:
+            - "ME_CONFIG_OPTIONS_EDITORTHEME=ambiance"
+            - "ME_CONFIG_MONGODB_SERVER=db"
+            - "ME_CONFIG_BASICAUTH_USERNAME=user"
+            - "ME_CONFIG_BASICAUTH_PASSWORD=fairly long password"
+
+    db:
+        image: mongo:3.6
+        ports:
+            - 27017:27017
+        restart: on-failure
+        volumes:
+            - ./db/db:/data/db
+        restart: always
+
+    letsencrypt-init:
+        # https://stackoverflow.com/questions/39846649/how-to-use-lets-encrypt-with-docker-container-based-on-the-node-js-image
+        image: certbot/certbot:v0.21.1
+        env_file:
+            - .env
+        ports:
+            - 80:80
+            - 443:443
+        volumes:
+            - ./web/letsencrypt/etc/letsencrypt:/etc/letsencrypt
+            - ./web/letsencrypt/var/lib/letsencrypt:/var/lib/letsencrypt
+            - ./web/letsencrypt/usr/share/nginx/html:/usr/share/nginx/html
+        command: certonly -n -d ${CERT_DOMAIN} -m ${CERT_EMAIL} --standalone --agree-tos
+    letsencrypt-renew:
+        image: certbot/certbot:v0.21.1
+        env_file:
+            - .env
+        volumes:
+            - ./web/letsencrypt/etc/letsencrypt:/etc/letsencrypt
+            - ./web/letsencrypt/var/lib/letsencrypt:/var/lib/letsencrypt
+            - ./web/letsencrypt/usr/share/nginx/html:/usr/share/nginx/html
+        command: certonly -n -d 2.kasp.io --webroot -w /usr/share/nginx/html --agree-tos
