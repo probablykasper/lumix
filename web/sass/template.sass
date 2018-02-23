@@ -9,19 +9,66 @@ main.page-container
 header.site-header
     z-index: 5
     height: $header-height
-    // background-color: #16C19D
-    // background-color: #5A73E2
-    // background-color: #2A2A2A
     display: flex
     align-items: center
     justify-content: space-between
     padding: 0px 20px
     color: $black
-    a.header-logo
-        font-size: 38px
-        padding: 8px
+    .left-side-header, .right-side-header
+        width: 200px
+        padding: 0px 8px
+    .left-side-header
+        display: flex
+        align-items: center
+        a.header-logo
+            font-size: 38px
+            padding: 8px
     input.search
         padding: 10px 14px
         border-radius: 5px
         width: 250px
         background-color: $white-dark
+    .right-side-header
+        display: flex
+        align-items: center
+        justify-content: flex-end
+        .account-icon-container
+            max-height: 100%
+            position: relative
+            img.account-icon
+                margin: 10px 0px
+                cursor: pointer
+            .account-box
+                z-index: 10
+                background-color: #FFFFFF
+                box-shadow: $shadow-4
+                position: absolute
+                right: 0px
+                top: calc(100% - 8px)
+                overflow: hidden
+
+                height: 0px
+                width: 100px
+                pointer-events: none
+                transform-origin: right top
+                transition: $transition-20-out all
+                &.visible
+                    height: 120px
+                    width: 200px
+                    pointer-events: all
+                    transition: $transition-30-in all
+                .spacer
+                    height: 10px
+                a.account-box-item
+                    height: 50px
+                    display: flex
+                    align-items: center
+                    padding: 0px 18px
+                    flex-grow: 1
+                    cursor: pointer
+                    .item-text
+                        margin-left: 4px
+                        font-size: 15px
+                        color: $black
+                    &:hover
+                        background-color: #F2F2F2

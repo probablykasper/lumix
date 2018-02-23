@@ -70,7 +70,20 @@
 "use strict";
 
 
-// search
+$(document).ready(function () {
+
+    __webpack_require__(1);
+    if (loggedIn) {}
+});
+
+/***/ }),
+/* 1 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+// search, press enter
 var searchField = $(".search")[0];
 $(".search").keypress(function (e) {
     if (e.which == 13) {
@@ -78,6 +91,19 @@ $(".search").keypress(function (e) {
         window.location = "/search/" + searchQuery;
     }
 });
+
+if (loggedIn) {
+
+    // press profile pic to toggle account box
+    $("img.account-icon").on("click", function () {
+        $(".account-box").toggleClass("visible");
+    });
+    $(document).on("click", function (e) {
+        if (!$(e.target).parents(".account-icon-container").length) {
+            $(".account-box").removeClass("visible");
+        }
+    });
+}
 
 /***/ })
 /******/ ]);

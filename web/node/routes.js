@@ -72,7 +72,7 @@ module.exports = (app) => {
                 variables.profilePictureURL = req.user.profilePictureURL;
                 variables.transactions = req.user.transactions;
                 render("logged-in/"+pugFile, (err) => {
-                    logErr(72001, err);
+                    // logErr(72001, err);
                     render("logged-out/"+loggedOutPugFile, (err) => {
                         logErr(72002, err);
                     });
