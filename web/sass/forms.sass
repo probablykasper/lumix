@@ -1,0 +1,21 @@
+.form-container
+    position: absolute
+    height: calc(100% - #{$header-height})
+    width: 100%
+    top: 70px
+
+    display: flex
+    align-items: center
+    justify-content: center
+    flex-direction: column
+    font-size: 15px
+    .form
+        input.form-field
+            padding: 10px 14px
+            margin-top: 5px
+            margin-bottom: 15px
+            border-radius: 5px
+            width: 250px
+            background-color: $white-dark
+        &.login-form
+        &.register-form

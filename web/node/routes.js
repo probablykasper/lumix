@@ -1,5 +1,8 @@
 "use strict";
 const passport = require("passport");
+const validator = require("validator");
+const User = require("./mongoose-models").User;
+const bcrypt = require("bcryptjs");
 
 function render(app, res, pugFile, variables, callback) {
     app.render(pugFile, variables, (err, html) => {
@@ -86,11 +89,78 @@ module.exports = (app) => {
         });
     }
 
-    const scope = {scope: ["profile"]};
-    app.get("/login", passport.authenticate("google", scope));
+    // app.post("/login", passport.authenticate("local", {
+    //     successRedirect: "/",
+    //     failureRedirect: "/login",
+    //     failureFlash: false
+    // }));
 
-    app.get("/auth/google/callback", passport.authenticate("google"), (req, res) => {
-        res.redirect("/");
+    app.post("/register", (req, res) => {
+        let displayname = req.body.displayname
+        let username = req.body.username
+        let email = req.body.email
+        let password = req.body.password
+        let errors = [];
+
+        if      (validator.isEmpty(displayname))                    errors.push("displayname empty");
+        else if (!validator.isLength(displayname, {max: 30}))       errors.push("displayname length");
+
+        const usernameRegex = new RegExp(/^[a-zA-Z0-9]+$/g);
+        if      (validator.isEmpty(username))                       errors.push("username empty");
+        else if (!username.match(usernameRegex))                    errors.push("username chars");
+        else if (!validator.isLength(username, {max: 30}))          errors.push("username length");
+
+        if      (validator.isEmpty(password))                       errors.push("password empty");
+        else if (!validator.isLength(password, {min: 6, max: 100})) errors.push("password length");
+
+        if      (validator.isEmpty(email))                          errors.push("email empty");
+        else if (!validator.isEmail(email))                         errors.push("email invalid");
+        else if (!validator.isLength(email, {max: 60}))             errors.push("email length");
+
+        if (errors.length == 0) {
+            User.findOne({email: email}, (err, resultUser) => {
+                if (err) errors.push("unknown");
+                if (resultUser) errors.push("email exists");
+                User.findOne({username: username}, (err, resultUser) => {
+                    if (err) errors.push("unknown");
+                    if (resultUser) errors.push("username exists");
+                    if (errors.length == 0) {
+                        bcrypt.genSalt(10, (err, salt) => {
+                            if (err) errors.push("unknown");
+                            bcrypt.hash(password, salt, (err, hashedPassword) => {
+                                if (err) errors.push("unknown");
+                                new User({
+                                    displayname: displayname,
+                                    username: username,
+                                    email: email,
+                                    password: password,
+                                }).save((err) => {
+                                    if (err) errors.push("unknown");
+                                    if (errors.length == 0) {
+                                        console.log("success");
+                                        res.json({
+                                            errors: null,
+                                        });
+                                    } else {
+                                        res.json({
+                                            errors: errors,
+                                        });
+                                    }
+                                });
+                            });
+                        });
+                    } else {
+                        res.json({
+                            errors: errors,
+                        });
+                    }
+                });
+            });
+        } else {
+            res.json({
+                errors: errors,
+            });
+        }
     });
 
     app.get("/logout", (req, res) => {
@@ -98,6 +168,8 @@ module.exports = (app) => {
         res.redirect("/");
     });
 
+    get("/login", "login");
+    get("/register", "register");
     get("/", "home");
 
     // get("/balance", "balance");

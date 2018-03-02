@@ -1,0 +1,51 @@
+.button
+    padding: 12px 8px
+    position: relative
+    &:hover::before
+        width: 50%
+    &:focus::before
+        width: 80%
+        transform: translate(-50%, -2px)
+    &::before
+        content: ""
+        position: absolute
+        transition: $transition-20 all
+        background-color: $gray-line
+        bottom: 0px
+        transform: translate(-50%, 0px)
+        left: 50%
+        height: 2px
+        width: 0%
+        border-radius: 5px
+
+
+// .button
+//     padding: 14px 30px
+//     position: relative
+//     background-color: transparent
+//     &:hover
+//         &::before
+//             height: 70%
+//         &::after
+//             height: 70%
+//     &:focus
+//         &::before
+//             height: 90%
+//             transform: translate(4px, -50%)
+//         &::after
+//             height: 90%
+//             transform: translate(-4px, -50%)
+//     &::before, &::after
+//         content: ""
+//         position: absolute
+//         background-color: $gray-line
+//         transition: $transition-20 all
+//         top: 50%
+//         transform: translate(0px, -50%)
+//         width: 2px
+//         height: 50%
+//         border-radius: 5px
+//     &::before
+//         left: 0px
+//     &::after
+//         right: 0px

@@ -11,9 +11,10 @@ const imageSchema = new Schema({
 }, { typeKey: "$Type"});
 
 const userSchema = new Schema({
-    displayName: String,
-    googleId: String,
-    profilePictureURL: String,
+    displayname: String,
+    username: String,
+    email: String,
+    password: String,
     // images: [imageSchema],
 }, { typeKey: "$Type" });
 

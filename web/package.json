@@ -30,9 +30,11 @@
         "body-parser": "1.18.x",
 
         "passport": "0.4.x",
-        "passport-google-oauth": "1.0.x",
+        "passport-local": "1.0.x",
         "express-session": "1.15.x",
         "connect-mongo": "2.0.x",
+        "validator": "9.4.x",
+        "bcryptjs": "2.4.x",
 
         "mongoose": "5.0.x"
     }

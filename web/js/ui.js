@@ -20,3 +20,16 @@ if (loggedIn) {
     });
 
 }
+
+// function fullPageElement(element) {
+//     const headerHeight = $(".site-header").height();
+//     let windowHeight = $(window).height();
+//     element.height(windowHeight - headerHeight);
+//     $(window).on("resize", () => {
+//         windowHeight = $(window).height();
+//         element.height(windowHeight - headerHeight);
+//     });
+// }
+// if (page == "home") fullPageElement($(".center-container"));
+// if (page == "login") fullPageElement($(".form-container"));
+// if (page == "register") fullPageElement($(".form-container"));

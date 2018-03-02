@@ -1,0 +1,28 @@
+//- form(action="/login", method="post")
+//-   div
+//-     label Email:
+//-     input(type="text", name="username")
+//-   div
+//-     label Username:
+//-     input(type="text", name="username")
+//-   div
+//-     label Password:
+//-     input(type="password", name="password")
+//-   div
+//-     label Repeat Password:
+//-     input(type="password", name="password")
+//-   div
+//-     input(type="submit", value="Register")
+
+
+.form-container.register-form
+    .form
+        label(for="displayname") Displayname
+        input.form-field.displayname(type="text", name="displayname" id="displayname")
+        label(for="username") Username
+        input.form-field.username(type="text", name="username" id="username")
+        label(for="email") Email
+        input.form-field.email(type="text", name="email" id="email")
+        label(for="password") Password
+        input.form-field.password(type="password", name="password" id="password")
+    button.button.register(tabIndex="0") Register

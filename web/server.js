@@ -42,7 +42,7 @@ const PORT_SECURE = process.env.PORT_SECURE;
 
     // mongoose
     const mongoose = require("mongoose");
-    mongoose.connect("mongodb://db/cryp");
+    mongoose.connect("mongodb://db/lumix");
     const db = mongoose.connection;
     const dbSuc = "\x1b[42m[Mongoose]\x1b[0m ";
     db.on("error", console.error.bind(console, "connection error:"));
@@ -51,23 +51,25 @@ const PORT_SECURE = process.env.PORT_SECURE;
     });
 
     // passport
-    const passport = require("passport");
-    const passportSetup = require("./node/passport-setup");
-    const session = require("express-session");
-    const MongoStore = require("connect-mongo")(session);
-    app.use(session({
-        // key: "sess",
-        secret: "tomatonanaboy69:o",
-        store: new MongoStore({
-            mongooseConnection: mongoose.connection,
-            ttl: 60*60*24*90,
-            touchAfter: 60*60*24
-        }),
-        resave: false,
-        saveUninitialized: false
-    }));
-    app.use(passport.initialize());
-    app.use(passport.session());
+    require("./node/passport-setup.js")(app, mongoose);
+
+    // const passport = require("passport");
+    // const passportSetup = require("./node/passport-setup");
+    // const session = require("express-session");
+    // const MongoStore = require("connect-mongo")(session);
+    // app.use(session({
+    //     // key: "sess",
+    //     secret: "tomatonanaboy69:o",
+    //     store: new MongoStore({
+    //         mongooseConnection: mongoose.connection,
+    //         ttl: 60*60*24*90,
+    //         touchAfter: 60*60*24
+    //     }),
+    //     resave: false,
+    //     saveUninitialized: false
+    // }));
+    // app.use(passport.initialize());
+    // app.use(passport.session());
 
     // routes
     require("./node/routes")(app);
