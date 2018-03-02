@@ -4,7 +4,7 @@ const ExtractTextPlugin = require("extract-text-webpack-plugin");
 
 let ifDev = false;
 let ifProduction = true;
-if (process.env.CRYP_ENV == "dev") {
+if (process.env.APP_ENV == "dev") {
     ifDev = true;
     ifProduction = false;
 }

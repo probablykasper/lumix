@@ -96,7 +96,6 @@ window.loopObject = function (object, callback) {
         i++;
     }
 };
-
 window.xhr = function (reqContent, url, callback) {
     var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
 

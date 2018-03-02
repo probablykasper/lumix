@@ -12,4 +12,4 @@ WORKDIR /usr/src/app
 
 COPY . .
 
-CMD npm run ${LUMIX_ENV}
+CMD npm run ${APP_ENV}

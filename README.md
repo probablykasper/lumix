@@ -4,7 +4,7 @@ Art website
 ### Get Started
 - Install Docker Compose if you do not already have it.
 - Set your environment variables in `.env`. This assumes your server only uses *one* domain.
-    - `LUMIX_ENV`: `dev` or `production`.
+    - `APP_ENV`: `dev` or `production`.
     - `CERT_DOMAIN`: Set this to your domain name.
     - `CERT_EMAIL`: The email your TLS certficiate will be registered with.
 - Create the file `web/node/keys.js`, and fill in your Google API Client ID and Client Secret in it. To get those:
@@ -24,6 +24,6 @@ Art website
     ```
 
 ### Usage
-- Register TLS certificate: `docker-compose up letsencrypt-init`.
-- Renew TLS certificate: `docker-compose up letsencrypt-renew`.
-- Start server: `docker-compose up web`.
+- Register TLS certificate: `docker-compose -f docker-compose-extras.yml up letsencrypt-init`.
+- Renew TLS certificate: `docker-compose -f docker-compose-extras.yml up letsencrypt-renew`.
+- Start server: `docker-compose up`.
