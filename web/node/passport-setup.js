@@ -3,12 +3,15 @@ const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
 const keys = require("./keys");
 const User = require("./mongoose-models").User;
+const bcrypt = require("bcryptjs");
 
 passport.serializeUser((user, done) => {
-    done(null, user.id);
+    console.log(555);
+    done(null, user._id);
 });
 
 passport.deserializeUser((id, done) => {
+    console.log(444);
     User.findById(id).then((resultUser) => {
         done(null, resultUser);
     });
@@ -19,46 +22,17 @@ passport.use(new LocalStrategy({
     passwordField: "password",
 }, (username, password, done) => {
     User.findOne({ username: username }, function(err, resultUser) {
-        if (err) {
-            done(err);
-        } else if (!resultUser) {
-            done(null, false, {
-                message: "Incorrect username."
-            });
-        } else if (!resultUser.validPassword(password)) {
-            done(null, false, {
-                message: "Incorrect password."
-            });
-        } else {
-            done(null, resultUser);
-        }
+        if (err) return done(err);
+        if (!resultUser) return done(null, false, {message: "incorrect username"});
+        // match password
+        bcrypt.compare(password, resultUser.password, (err, isMatch) => {
+            if (err) return done(err);
+            if (isMatch) return done(null, resultUser);
+            if (!isMatch) return done(null, false, {message: "incorrect password"});
+        });
+
     });
 }));
-
-// passport.use(new GoogleStrategy({
-//     clientID: keys.google.clientID,
-//     clientSecret: keys.google.clientSecret,
-//     callbackURL: "/auth/google/callback"
-// }, (accessToken, refreshToken, profile, done) => {
-//     User.findOne({googleId: profile.id}).then((resultUser) => {
-//         if (resultUser) {
-//             // user alreaady exists
-//             // console.log(`login: ${resultUser.googleId} ${resultUser.displayName}`);
-//             done(null, resultUser);
-//         } else {
-//             // new user
-//             new User({
-//                 displayName: profile.displayName,
-//                 googleId: profile.id,
-//                 profilePictureURL: profile.photos[0].value
-//             }).save().then((newUser) => {
-//                 // console.log(`newlogin: ${newUser.googleId} ${newUser.displayName}`);
-//                 done(null, newUser);
-//             });
-//         }
-//     });
-// }));
-
 
 const session = require("express-session");
 const MongoStore = require("connect-mongo")(session);

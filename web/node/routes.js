@@ -95,11 +95,78 @@ module.exports = (app) => {
     //     failureFlash: false
     // }));
 
+    app.post("/login", (req, res) => {
+        let email = req.body.email;
+        let password = req.body.password;
+        let errors = [];
+
+        function sendResponse() {
+            if (errors.length == 0) {
+                res.json({
+                    errors: null,
+                });
+            } else {
+                res.json({
+                    errors: errors,
+                });
+            }
+        }
+
+        function checkIfUserExists(email, callback) {
+            User.findOne({email: email}, (err, resultUser) => {
+
+                if (resultUser) return callback(null, resultUser);
+                if (!resultUser) {
+                    User.findOne({username: email}, (err, resultUser) => {
+                        if (err) return callback("unknown 9");
+                        if (resultUser) return callback(null, resultUser);
+                        if (!resultUser) callback("email does not exist");
+                    });
+                }
+            });
+        }
+
+        checkIfUserExists(email, (err, resultUser) => {
+            if (err) errors.push(err);
+            if (errors.length != 0) return sendResponse();
+
+            req.body.username = resultUser.username;
+            console.log(req.body.username);
+            passport.authenticate("local", (err, user, info) => {
+                if (err) errors.push("unknown 6");
+                if (errors.length != 0) return sendResponse();
+
+                if (!user) {
+                    if (info.email) errors.push(info.email);
+                    if (info.password) errors.push(info.password);
+                    if (errors.length != 0) return sendResponse();
+                } else {
+                    req.login(user, (err) => {
+                        if (err) errors.push("unknown 7");
+                        sendResponse();
+                    });
+                }
+            })(req, res);
+
+            // passport.authenticate("local", (err, user, info) => {
+            //     if (err) return next(err);
+            //     if (!user) return res.redirect("/login");
+            //     req.logIn(user, (err) => {
+            //         if (err) return next(err);
+            //         return res.redirect("/users/"+user.username);
+            //     });
+            // })(req, res, next);
+
+        });
+
+
+    });
+
     app.post("/register", (req, res) => {
-        let displayname = req.body.displayname
-        let username = req.body.username
-        let email = req.body.email
-        let password = req.body.password
+        let displayname = req.body.displayname;
+        let username = req.body.username;
+        let email = req.body.email;
+        let password = req.body.password;
         let errors = [];
 
         if      (validator.isEmpty(displayname))                    errors.push("displayname empty");
@@ -117,51 +184,71 @@ module.exports = (app) => {
         else if (!validator.isEmail(email))                         errors.push("email invalid");
         else if (!validator.isLength(email, {max: 60}))             errors.push("email length");
 
-        if (errors.length == 0) {
+        function sendResponse() {
+            if (errors.length == 0) {
+                res.json({
+                    errors: null,
+                });
+            } else {
+                res.json({
+                    errors: errors,
+                });
+            }
+        }
+
+        function checkIfUserExists(email, username, callback) {
             User.findOne({email: email}, (err, resultUser) => {
-                if (err) errors.push("unknown");
-                if (resultUser) errors.push("email exists");
+                if (err) return callback("unknown 1");
+                if (resultUser) return callback("email exists");
                 User.findOne({username: username}, (err, resultUser) => {
-                    if (err) errors.push("unknown");
-                    if (resultUser) errors.push("username exists");
-                    if (errors.length == 0) {
-                        bcrypt.genSalt(10, (err, salt) => {
-                            if (err) errors.push("unknown");
-                            bcrypt.hash(password, salt, (err, hashedPassword) => {
-                                if (err) errors.push("unknown");
-                                new User({
-                                    displayname: displayname,
-                                    username: username,
-                                    email: email,
-                                    password: password,
-                                }).save((err) => {
-                                    if (err) errors.push("unknown");
-                                    if (errors.length == 0) {
-                                        console.log("success");
-                                        res.json({
-                                            errors: null,
-                                        });
-                                    } else {
-                                        res.json({
-                                            errors: errors,
-                                        });
-                                    }
-                                });
-                            });
-                        });
-                    } else {
-                        res.json({
-                            errors: errors,
-                        });
-                    }
+                    if (err) return callback("unknown 2");
+                    if (resultUser) return callback("username exists");
+                    callback(null);
                 });
             });
-        } else {
-            res.json({
-                errors: errors,
+        }
+
+        function generateHash(password, callback) {
+            bcrypt.genSalt(10, (err, salt) => {
+                if (err) return callback("unknown 3");
+                bcrypt.hash(password, salt, (err, hashedPassword) => {
+                    if (err) return callback("unknown 4");
+                    callback(null, hashedPassword);
+                });
             });
         }
+
+        function newUser(userObject, callback) {
+            new User(userObject).save((err) => {
+                if (err) return callback("unknown 5");
+                callback(null);
+            });
+        }
+
+        if (errors.length != 0) return sendResponse();
+        checkIfUserExists(email, username, (err) => {
+            if (err) errors.push(err);
+            if (errors.length != 0) return sendResponse();
+
+            generateHash(password, (err, hashedPassword) => {
+                if (err) errors.push(err);
+                if (errors.length != 0) return sendResponse();
+
+                new User({
+                    displayname: displayname,
+                    username: username,
+                    email: email,
+                    password: hashedPassword,
+                }).save((err) => {
+                    if (err) errors.push("unknown 5");
+                    sendResponse();
+                });
+            });
+        });
+
     });
+
+
 
     app.get("/logout", (req, res) => {
         req.logout();

@@ -9,6 +9,7 @@ window.loopObject = (object, callback) => {
         i++;
     }
 }
+
 window.xhr = (reqContent, url, callback, options = {}) => {
     var xhr = new XMLHttpRequest();
     if (options.type == undefined)        options.type = "POST";

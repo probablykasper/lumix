@@ -7,10 +7,21 @@ if (page == "register") {
             email: $(".register-form input.email").val(),
             password: $(".register-form input.password").val(),
         }
-        // const req =
-        // `email=${email}`+
-        // `&password=${password}`
         xhr(req, "/register", (res, err) => {
+            if (err); // http status code not 2xx
+            console.log(res);
+        });
+    });
+}
+
+// login form
+if (page == "login") {
+    $("button.login").on("click", () => {
+        const req = {
+            email: $(".login-form input.email").val(),
+            password: $(".login-form input.password").val(),
+        }
+        xhr(req, "/login", (res, err) => {
             if (err); // http status code not 2xx
             console.log(res);
         });
