@@ -10,7 +10,9 @@
     flex-direction: column
     font-size: 15px
     .form
-        input.form-field
+        textarea
+            resize: none
+        input.form-field, textarea.form-field, .tags-box
             padding: 10px 14px
             margin-top: 5px
             margin-bottom: 15px
@@ -19,3 +21,54 @@
             background-color: $white-dark
         &.login-form
         &.register-form
+.form-container.upload-form
+    button.files
+        margin: auto
+    input#files
+        display: none
+    input.form-field, textarea.form-field, .tags-box
+        width: 600px
+    .tags-box
+        background-color: $white-dark
+        display: flex
+        flex-wrap: wrap
+        padding-bottom: calc(10px - 6px)
+        $tag-padding: 5px
+        cursor: text
+        .tag
+            padding: $tag-padding 0px
+            margin-right: 10px
+            margin-bottom: 6px
+            line-height: initial
+            .tag-text
+                display: inline-block
+                word-break: break-word
+            button.remove-tag
+                display: inline
+                padding: 0px $tag-padding
+                user-select: none
+                font-weight: 300
+                cursor: pointer
+                background-color: transparent
+
+                position: relative
+                &:hover::before
+                    width: 50%
+                &:focus::before
+                    width: 80%
+                    transform: translate(-50%, 6px)
+                &::before
+                    content: ""
+                    position: absolute
+                    transition: $transition-20 all
+                    background-color: $gray-line
+                    bottom: 0px
+                    transform: translate(-50%, 8px)
+                    left: 50%
+                    height: 2px
+                    width: 0%
+                    border-radius: 5px
+        input.add-tag
+            padding: $tag-padding $tag-padding
+            margin-bottom: 6px
+            background-color: transparent

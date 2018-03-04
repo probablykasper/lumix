@@ -53,26 +53,9 @@ const PORT_SECURE = process.env.PORT_SECURE;
     // passport
     require("./node/passport-setup.js")(app, mongoose);
 
-    // const passport = require("passport");
-    // const passportSetup = require("./node/passport-setup");
-    // const session = require("express-session");
-    // const MongoStore = require("connect-mongo")(session);
-    // app.use(session({
-    //     // key: "sess",
-    //     secret: "tomatonanaboy69:o",
-    //     store: new MongoStore({
-    //         mongooseConnection: mongoose.connection,
-    //         ttl: 60*60*24*90,
-    //         touchAfter: 60*60*24
-    //     }),
-    //     resave: false,
-    //     saveUninitialized: false
-    // }));
-    // app.use(passport.initialize());
-    // app.use(passport.session());
-
     // routes
     require("./node/routes")(app);
+    require("./node/upload-routes")(app);
 
     const httpsOptions = {
         key: fs.readFileSync(dir(`letsencrypt/etc/letsencrypt/live/${process.env.CERT_DOMAIN}/privkey.pem`)),

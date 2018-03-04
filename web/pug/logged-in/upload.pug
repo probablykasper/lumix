@@ -1,0 +1,17 @@
+.form-container.upload-form.page-width
+    .form
+        button.button.files Select file
+        input(type="file" name="files" id="files")
+        label(for="title") Title
+        input.form-field.title(type="text", name="title" id="title")
+        label(for="description") Description
+        textarea.form-field.auto-resize.description(type="text", name="description" id="description", rows="3")
+        .tags-box
+            .tag
+                .tag-text Hey
+                button.remove-tag x
+            .tag
+                .tag-text There
+                button.remove-tag x
+            input.add-tag(placeholder="Add a tag...")
+    button.button.upload(tabIndex="0") Upload

@@ -19,7 +19,7 @@ span, h1, h2, h3, h4, h5, h6, p, a,
 form, label, legend, fieldset,
 table, tbody, tfoot, thead, tr, th, td,
 aside, canvas, footer, header, menu, nav,
-section, audio, video, input, button {
+section, audio, video, input, button, textarea {
   color: #3F3F3F;
   font: inherit;
   margin: 0;
@@ -67,6 +67,9 @@ html {
 body {
   background-color: #FFFFFF;
   display: grid; }
+
+.page-width {
+  min-width: 800px; }
 
 header.site-header {
   font-size: 16px;
@@ -120,7 +123,10 @@ header.site-header {
       position: relative; }
       header.site-header .right-side-header .account-icon-container img.account-icon {
         margin: 10px 0px;
-        cursor: pointer; }
+        cursor: pointer;
+        padding: 8px;
+        width: 35px;
+        height: 35px; }
       header.site-header .right-side-header .account-icon-container .account-box {
         z-index: 10;
         background-color: #FFFFFF;
@@ -178,7 +184,8 @@ html .stuff {
 
 html .button {
   padding: 12px 8px;
-  position: relative; }
+  position: relative;
+  display: block; }
   html .button:hover::before {
     width: 50%; }
   html .button:focus::before {
@@ -206,10 +213,64 @@ html .form-container {
   justify-content: center;
   flex-direction: column;
   font-size: 15px; }
-  html .form-container .form input.form-field {
+  html .form-container .form textarea {
+    resize: none; }
+  html .form-container .form input.form-field, html .form-container .form textarea.form-field, html .form-container .form .tags-box {
     padding: 10px 14px;
     margin-top: 5px;
     margin-bottom: 15px;
     border-radius: 5px;
     width: 250px;
     background-color: #F3F3F3; }
+
+html .form-container.upload-form button.files {
+  margin: auto; }
+
+html .form-container.upload-form input#files {
+  display: none; }
+
+html .form-container.upload-form input.form-field, html .form-container.upload-form textarea.form-field, html .form-container.upload-form .tags-box {
+  width: 600px; }
+
+html .form-container.upload-form .tags-box {
+  background-color: #F3F3F3;
+  display: flex;
+  flex-wrap: wrap;
+  padding-bottom: calc(10px - 6px);
+  cursor: text; }
+  html .form-container.upload-form .tags-box .tag {
+    padding: 5px 0px;
+    margin-right: 10px;
+    margin-bottom: 6px;
+    line-height: initial; }
+    html .form-container.upload-form .tags-box .tag .tag-text {
+      display: inline-block;
+      word-break: break-word; }
+    html .form-container.upload-form .tags-box .tag button.remove-tag {
+      display: inline;
+      padding: 0px 5px;
+      user-select: none;
+      font-weight: 300;
+      cursor: pointer;
+      background-color: transparent;
+      position: relative; }
+      html .form-container.upload-form .tags-box .tag button.remove-tag:hover::before {
+        width: 50%; }
+      html .form-container.upload-form .tags-box .tag button.remove-tag:focus::before {
+        width: 80%;
+        transform: translate(-50%, 6px); }
+      html .form-container.upload-form .tags-box .tag button.remove-tag::before {
+        content: "";
+        position: absolute;
+        transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1) all;
+        background-color: #717171;
+        bottom: 0px;
+        transform: translate(-50%, 8px);
+        left: 50%;
+        height: 2px;
+        width: 0%;
+        border-radius: 5px; }
+  html .form-container.upload-form .tags-box input.add-tag {
+    padding: 5px 5px;
+    margin-bottom: 6px;
+    background-color: transparent; }

@@ -15,6 +15,7 @@ const userSchema = new Schema({
     username: String,
     email: String,
     password: String,
+    profilePictureURL: String,
     // images: [imageSchema],
 }, { typeKey: "$Type" });
 

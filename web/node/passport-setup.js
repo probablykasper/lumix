@@ -6,12 +6,10 @@ const User = require("./mongoose-models").User;
 const bcrypt = require("bcryptjs");
 
 passport.serializeUser((user, done) => {
-    console.log(555);
     done(null, user._id);
 });
 
 passport.deserializeUser((id, done) => {
-    console.log(444);
     User.findById(id).then((resultUser) => {
         done(null, resultUser);
     });
@@ -23,12 +21,12 @@ passport.use(new LocalStrategy({
 }, (username, password, done) => {
     User.findOne({ username: username }, function(err, resultUser) {
         if (err) return done(err);
-        if (!resultUser) return done(null, false, {message: "incorrect username"});
+        if (!resultUser) return done(null, false, "incorrect email");
         // match password
         bcrypt.compare(password, resultUser.password, (err, isMatch) => {
             if (err) return done(err);
             if (isMatch) return done(null, resultUser);
-            if (!isMatch) return done(null, false, {message: "incorrect password"});
+            if (!isMatch) return done(null, false, "incorrect password");
         });
 
     });

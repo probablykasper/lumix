@@ -15,21 +15,6 @@ function render(app, res, pugFile, variables, callback) {
     });
 }
 
-function jsonRes(res, one, two) {
-    let resObj = {};
-    if (one == "err") {
-        resObj = {
-            err: {
-                code: null,
-                msg: null
-            }
-        };
-    } else if (one) {
-        resObj = one;
-    }
-    res.json(resObj);
-}
-
 module.exports = (app) => {
 
     app.all("*", (req, res, next) => {
@@ -71,9 +56,10 @@ module.exports = (app) => {
             variables.page = pugFile;
             variables.loggedIn = res.locals.loggedIn;
             if (res.locals.loggedIn) {
-                variables.displayName = req.user.displayName;
+                variables.displayname = req.user.displayname;
+                variables.username = req.user.username;
+                variables.email = req.user.email;
                 variables.profilePictureURL = req.user.profilePictureURL;
-                variables.transactions = req.user.transactions;
                 render("logged-in/"+pugFile, (err) => {
                     // logErr(72001, err);
                     render("logged-out/"+loggedOutPugFile, (err) => {
@@ -82,6 +68,7 @@ module.exports = (app) => {
                 });
             } else {
                 render("logged-out/"+loggedOutPugFile, (err) => {
+                    res.redirect(`/login?redirect=${path}`);
                     logErr(72003, err);
                 });
             }
@@ -89,27 +76,16 @@ module.exports = (app) => {
         });
     }
 
-    // app.post("/login", passport.authenticate("local", {
-    //     successRedirect: "/",
-    //     failureRedirect: "/login",
-    //     failureFlash: false
-    // }));
-
     app.post("/login", (req, res) => {
         let email = req.body.email;
         let password = req.body.password;
         let errors = [];
 
         function sendResponse() {
-            if (errors.length == 0) {
-                res.json({
-                    errors: null,
-                });
-            } else {
-                res.json({
-                    errors: errors,
-                });
-            }
+            res.json({
+                errors: errors,
+                redirect: req.query.redirect || "/",
+            });
         }
 
         function checkIfUserExists(email, callback) {
@@ -131,14 +107,12 @@ module.exports = (app) => {
             if (errors.length != 0) return sendResponse();
 
             req.body.username = resultUser.username;
-            console.log(req.body.username);
             passport.authenticate("local", (err, user, info) => {
                 if (err) errors.push("unknown 6");
                 if (errors.length != 0) return sendResponse();
 
                 if (!user) {
-                    if (info.email) errors.push(info.email);
-                    if (info.password) errors.push(info.password);
+                    if (info) errors.push(info);
                     if (errors.length != 0) return sendResponse();
                 } else {
                     req.login(user, (err) => {
@@ -148,15 +122,6 @@ module.exports = (app) => {
                 }
             })(req, res);
 
-            // passport.authenticate("local", (err, user, info) => {
-            //     if (err) return next(err);
-            //     if (!user) return res.redirect("/login");
-            //     req.logIn(user, (err) => {
-            //         if (err) return next(err);
-            //         return res.redirect("/users/"+user.username);
-            //     });
-            // })(req, res, next);
-
         });
 
 
@@ -164,7 +129,7 @@ module.exports = (app) => {
 
     app.post("/register", (req, res) => {
         let displayname = req.body.displayname;
-        let username = req.body.username;
+        let username = req.body.username.toLowerCase();
         let email = req.body.email;
         let password = req.body.password;
         let errors = [];
@@ -172,7 +137,7 @@ module.exports = (app) => {
         if      (validator.isEmpty(displayname))                    errors.push("displayname empty");
         else if (!validator.isLength(displayname, {max: 30}))       errors.push("displayname length");
 
-        const usernameRegex = new RegExp(/^[a-zA-Z0-9]+$/g);
+        const usernameRegex = new RegExp(/^[a-z0-9]+$/g);
         if      (validator.isEmpty(username))                       errors.push("username empty");
         else if (!username.match(usernameRegex))                    errors.push("username chars");
         else if (!validator.isLength(username, {max: 30}))          errors.push("username length");
@@ -185,15 +150,9 @@ module.exports = (app) => {
         else if (!validator.isLength(email, {max: 60}))             errors.push("email length");
 
         function sendResponse() {
-            if (errors.length == 0) {
-                res.json({
-                    errors: null,
-                });
-            } else {
-                res.json({
-                    errors: errors,
-                });
-            }
+            res.json({
+                errors: errors,
+            });
         }
 
         function checkIfUserExists(email, username, callback) {
@@ -239,6 +198,8 @@ module.exports = (app) => {
                     username: username,
                     email: email,
                     password: hashedPassword,
+
+                    profilePictureURL: "http://kasp.io/cdn/logos/kh-logo-aevi.png",
                 }).save((err) => {
                     if (err) errors.push("unknown 5");
                     sendResponse();
@@ -248,20 +209,17 @@ module.exports = (app) => {
 
     });
 
-
-
     app.get("/logout", (req, res) => {
         req.logout();
         res.redirect("/");
     });
 
+    // logged out
     get("/login", "login");
     get("/register", "register");
     get("/", "home");
 
-    // get("/balance", "balance");
-    // get("/gains", "gains");
-    //
-    // get("/transactions", "transactions");
+    // logged in
+    get("/upload", "upload");
 
 }

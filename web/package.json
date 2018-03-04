@@ -36,6 +36,8 @@
         "validator": "9.4.x",
         "bcryptjs": "2.4.x",
 
-        "mongoose": "5.0.x"
+        "mongoose": "5.0.x",
+        "fine-uploader": "5.15.x",
+        "multiparty": "4.1.x"
     }
 }
