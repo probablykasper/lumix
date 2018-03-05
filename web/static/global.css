@@ -185,7 +185,8 @@ html .stuff {
 html .button {
   padding: 12px 8px;
   position: relative;
-  display: block; }
+  display: block;
+  background-color: transparent; }
   html .button:hover::before {
     width: 50%; }
   html .button:focus::before {
@@ -213,18 +214,37 @@ html .form-container {
   justify-content: center;
   flex-direction: column;
   font-size: 15px; }
-  html .form-container .form textarea {
-    resize: none; }
-  html .form-container .form input.form-field, html .form-container .form textarea.form-field, html .form-container .form .tags-box {
-    padding: 10px 14px;
-    margin-top: 5px;
-    margin-bottom: 15px;
-    border-radius: 5px;
-    width: 250px;
-    background-color: #F3F3F3; }
+  html .form-container .form {
+    position: relative; }
+    html .form-container .form textarea {
+      resize: none; }
+    html .form-container .form input.form-field, html .form-container .form textarea.form-field, html .form-container .form .tags-box {
+      padding: 10px 14px;
+      margin-top: 5px;
+      margin-bottom: 15px;
+      border-radius: 5px;
+      width: 250px;
+      background-color: #F3F3F3; }
 
-html .form-container.upload-form button.files {
-  margin: auto; }
+html .form-container.upload-form .container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  opacity: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1) all; }
+  html .form-container.upload-form .container.hidden {
+    opacity: 0;
+    pointer-events: none; }
+
+html .form-container.upload-form .main-form {
+  transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1) all; }
+  html .form-container.upload-form .main-form.hidden {
+    transform: scale(0.9);
+    opacity: 0; }
 
 html .form-container.upload-form input#files {
   display: none; }
@@ -274,3 +294,6 @@ html .form-container.upload-form .tags-box {
     padding: 5px 5px;
     margin-bottom: 6px;
     background-color: transparent; }
+
+html .form-container.upload-form button.upload {
+  margin: auto; }

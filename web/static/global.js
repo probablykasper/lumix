@@ -96,25 +96,32 @@ window.loopObject = function (object, callback) {
         i++;
     }
 };
-window.xhr = function (reqContent, url, callback) {
-    var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : {};
 
-    var xhr = new XMLHttpRequest();
+window.xhr = function (reqContent, url) {
+    var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+    var callback = arguments[3];
+
+    if (typeof options == "function") callback = options;
+    if (typeof options == "function") options = {};
     if (options.type == undefined) options.type = "POST";
     if (options.contentType == undefined) options.contentType = "json";
+    var xhr = new XMLHttpRequest();
     xhr.open(options.type, url, true);
     if (options.type == "GET") {
         xhr.send();
-    } else if (options.contentType == "values") {
+    } else if (options.contentType == "form") {
         xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
         xhr.send("data=" + JSON.stringify(reqContent));
     } else if (options.contentType == "json") {
         xhr.setRequestHeader("Content-type", "application/json");
         xhr.send(JSON.stringify(reqContent));
+    } else if (options.contentType == "none") {
+        xhr.send(reqContent);
+        // for file uploads (multipart/form-data)
+    } else if (options.contentType) {
+        xhr.setRequestHeader("Content-type", options.contentType);
+        xhr.send(reqContent);
     }
-    // else if (options.contentType == "multipart") {
-    //     // xhr.setRequestHeader("Content-type", "multipart/form-data");
-    // }
     xhr.onreadystatechange = function () {
         if (this.readyState == 4) {
             var res = JSON.parse(this.responseText);
@@ -142,7 +149,7 @@ window.fold = function (description, callback) {
 
 // search, press enter
 var searchField = $(".search")[0];
-$(".search").keypress(function (e) {
+$("body").on("keypress", ".search", function (e) {
     if (e.which == 13) {
         var searchQuery = searchField.value;
         window.location = "/search/" + searchQuery;
@@ -152,7 +159,7 @@ $(".search").keypress(function (e) {
 if (loggedIn) {
 
     // press profile pic to toggle account box
-    $("img.account-icon").on("click", function () {
+    $("body").on("click", "img.account-icon", function () {
         $(".account-box").toggleClass("visible");
     });
     $(document).on("click", function (e) {
@@ -162,18 +169,17 @@ if (loggedIn) {
     });
 }
 
-// function fullPageElement(element) {
-//     const headerHeight = $(".site-header").height();
-//     let windowHeight = $(window).height();
-//     element.height(windowHeight - headerHeight);
-//     $(window).on("resize", () => {
-//         windowHeight = $(window).height();
-//         element.height(windowHeight - headerHeight);
-//     });
-// }
-// if (page == "home") fullPageElement($(".center-container"));
-// if (page == "login") fullPageElement($(".form-container"));
-// if (page == "register") fullPageElement($(".form-container"));
+// auto-resize textareas
+$("body").on("input", "textarea.auto-resize", function (e) {
+    var textarea = e.target;
+    textarea.style.height = "auto";
+    var scrollheight = textarea.scrollHeight;
+    var computedStyle = getComputedStyle(textarea);
+    var paddingTop = computedStyle.paddingBottom.slice(0, -2);
+    var paddingBot = computedStyle.paddingTop.slice(0, -2);
+    var padding = Number(paddingTop) + Number(paddingBot);
+    textarea.style.height = textarea.scrollHeight - padding + "px";
+});
 
 /***/ }),
 /* 3 */
@@ -183,22 +189,202 @@ if (loggedIn) {
 
 
 // register form
-if (page == "register") {
-    $("button.register").on("click", function () {
+fold("register form", function () {
+
+    function submitRegisterForm() {
         var req = {
             displayname: $(".register-form input.displayname").val(),
             username: $(".register-form input.username").val(),
             email: $(".register-form input.email").val(),
             password: $(".register-form input.password").val()
-            // const req =
-            // `email=${email}`+
-            // `&password=${password}`
-        };xhr(req, "/register", function (res, err) {
+        };
+        xhr(req, "/register", function (res, err) {
             if (err) ; // http status code not 2xx
             console.log(res);
+            if (res.errors.length == 0) {
+                window.location = "/login";
+            }
         });
+    }
+
+    // register button click
+    $("body").on("click", "button.register", function () {
+        submitRegisterForm();
     });
-}
+
+    // enter to register
+    $("body").on("keypress", ".register-form input", function (e) {
+        if (e.which == 13) submitRegisterForm(); // enter
+    });
+});
+
+fold("login form", function () {
+
+    function submitLoginForm() {
+        var req = {
+            email: $(".login-form input.email").val(),
+            password: $(".login-form input.password").val()
+        };
+        xhr(req, "/login" + window.location.search, function (res, err) {
+            if (err) ; // http status code not 2xx
+            console.log(res);
+            if (res.errors.length == 0) {
+                window.location = res.redirect;
+            }
+        });
+    }
+
+    // login button click
+    $("body").on("click", ".login-form button.login", function () {
+        submitLoginForm();
+    });
+
+    // enter to login
+    $("body").on("keypress", ".login-form input", function (e) {
+        if (e.which == 13) submitLoginForm(); // enter
+    });
+});
+
+fold("upload form", function () {
+
+    fold("file select", function () {
+
+        // click "select file" button opens file select dialog
+        $("body").on("click", ".upload-form button.files", function () {
+            $(".upload-form input#files").click();
+        });
+
+        function containsAFile(e) {
+            if (e.originalEvent) e = e.originalEvent;
+            var dtTypes = e.dataTransfer.types;
+            if (dtTypes.length == 1 && dtTypes[0] == "Files") {
+                return true;
+            }
+            return false;
+        }
+
+        // setup
+        // const setupEvents = "drag dragstart dragend dragover dragenter dragleave drop";
+        var setupEvents = "dragover dragenter dragleave drop";
+        $(window).on(setupEvents, function (e) {
+            if (containsAFile(e)) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+        });
+
+        function show() {
+            $(".upload-form .select-file").addClass("hidden");
+            $(".upload-form button.files").addClass("file-drag");
+            $(".upload-form .drop-to-select-file").removeClass("hidden");
+        }
+        function hide() {
+            $(".upload-form .select-file").removeClass("hidden");
+            $(".upload-form button.files").removeClass("file-drag");
+            $(".upload-form .drop-to-select-file").addClass("hidden");
+        }
+        // show
+        $(window).on("dragenter", function (e) {
+            if (containsAFile(e)) show();
+            if (containsAFile(e)) $(".upload-form .main-form").addClass("hidden");
+        });
+        // hide
+        $(window).on("dragend dragleave", function (e) {
+            if (window.uploadData) {
+                $(".upload-form .main-form").removeClass("hidden");
+                hide();
+            }
+            e = e.originalEvent;
+            if (containsAFile(e)) {
+                if (e.type == "dragleave" && e.relatedTarget == null) hide();else if (e.type != "dragleave") hide();
+            }
+        });
+        // drop
+        $(window).on("drop", function (e) {
+            hide();
+            if (containsAFile(e)) {
+                var files = e.originalEvent.dataTransfer.files;
+                if (files[0].type == "image/png" || files[0].type == "image/jpeg") {
+                    handleFiles(files);
+                } else {// wrong fileExt
+
+                }
+            }
+        });
+
+        $("body").on("change", ".upload-form input#files", function (e) {
+            var input = $(this);
+            var files = input.prop("files");
+            handleFiles(files);
+        });
+
+        // handle files
+        function handleFiles(files) {
+            window.uploadData = files;
+            $(".select-file.container").addClass("hidden");
+            $(".upload-form .main-form").removeClass("hidden");
+        }
+    });
+
+    // add tag when comma/enter
+    $("body").on("keypress", ".upload-form input.add-tag", function (e) {
+        if (e.which == 44) e.preventDefault(); // comma
+        if (e.which == 44 || e.which == 13) {
+            // comma || enter
+            var $inputElement = $(this);
+            var value = $(this).val();
+            $inputElement.val(""); // empty the input
+            $("\n                <div class=\"tag\">\n                <div class=\"tag-text\">" + value + "</div>\n                <button class=\"remove-tag\">x</div>\n                </div>\n                ").insertBefore($inputElement);
+        }
+    });
+
+    // remove tag button
+    $("body").on("click", ".upload-form .remove-tag", function () {
+        $(this).parent().remove();
+    });
+
+    // clicking the tags-box focuses the add-tag input element
+    $("body").on("click", ".upload-form .tags-box", function (e) {
+        if (e.target == e.currentTarget) {
+            $(".upload-form input.add-tag").focus();
+        }
+    });
+
+    function upload() {
+
+        var data = new FormData();
+        data.append("image", uploadData[0], uploadData[0].name);
+        data.append("title", $(".upload-form input.title").val());
+        data.append("description", $(".upload-form textarea.description").val());
+
+        var tagsArray = [];
+        $(".upload-form .tags-box .tag").each(function (i, obj) {
+            var tagText = $(obj).find(".tag-text").html();
+            tagsArray.push(tagText);
+        });
+        data.append("tags", JSON.stringify(tagsArray));
+
+        console.log(data.get("image"));
+        console.log(data.get("title"));
+        console.log(data.get("description"));
+        console.log(data.get("tags"));
+
+        xhr(data, "/upload", {
+            contentType: "none"
+        }, function (res, err) {
+            if (err) ; // http status code not 2xx
+            console.log(res);
+            if (res.errors.length == 0) {
+                console.log("success!");
+            }
+        });
+    }
+
+    // upload button click
+    $("body").on("click", ".upload-form button.upload", function () {
+        upload();
+    });
+});
 
 /***/ })
 /******/ ]);

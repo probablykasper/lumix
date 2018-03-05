@@ -10,6 +10,7 @@
     flex-direction: column
     font-size: 15px
     .form
+        position: relative
         textarea
             resize: none
         input.form-field, textarea.form-field, .tags-box
@@ -22,8 +23,26 @@
         &.login-form
         &.register-form
 .form-container.upload-form
-    button.files
-        margin: auto
+    .container
+        position: absolute
+        width: 100%
+        height: 100%
+        // background-color: white
+        z-index: 1
+        opacity: 1
+        display: flex
+        align-items: center
+        justify-content: center
+        transition: $transition-20 all
+        &.hidden
+            opacity: 0
+            pointer-events: none
+    .main-form
+        &.hidden
+            transform: scale(0.9)
+            opacity: 0
+        transition: $transition-30 all
+
     input#files
         display: none
     input.form-field, textarea.form-field, .tags-box
@@ -72,3 +91,5 @@
             padding: $tag-padding $tag-padding
             margin-bottom: 6px
             background-color: transparent
+    button.upload
+        margin: auto
