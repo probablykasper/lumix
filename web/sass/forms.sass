@@ -27,7 +27,6 @@
         position: absolute
         width: 100%
         height: 100%
-        // background-color: white
         z-index: 1
         opacity: 1
         display: flex
@@ -41,8 +40,23 @@
         &.hidden
             transform: scale(0.9)
             opacity: 0
-        transition: $transition-30 all
-
+        transition: $transition-20 all
+    .thumbnail-container
+        position: fixed
+        width: 100%
+        height: 100%
+        top: 0px
+        left: 0px
+        pointer-events: none
+        opacity: 0
+        transition: $transition-40 all
+        &.visible
+            opacity: 0.15
+        .thumbnail
+            background-size: cover
+            background-position: center
+            width: 100%
+            height: 100%
     input#files
         display: none
     input.form-field, textarea.form-field, .tags-box

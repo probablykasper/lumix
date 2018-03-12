@@ -1,4 +1,5 @@
 "use strict";
+const Image = require("./mongoose-models").Image;
 
 function b32() {
     const length = 11;
@@ -13,12 +14,12 @@ const storage = multer.diskStorage({
         callback(null, "images/");
     },
     filename: function(req, file, callback) {
-        file.filename = b32();
+        file.fileID = b32();
         let extension;
         if      (file.mimetype == "image/jpeg") extension = ".jpg";
         else if (file.mimetype == "image/png") extension = ".png";
         else res.err = "wrongExt";
-        callback(null, file.filename+extension);
+        callback(null, file.fileID+extension);
     }
 });
 const upload = multer({
@@ -27,12 +28,40 @@ const upload = multer({
         fileSize: 30*1000*1000
     }
 });
+function multerUpload(path, fileSize) {
+    return multer({
+        storage: multer.diskStorage({
+            destination: function(req, file, callback) {
+                callback(null, path);
+            },
+            filename: function(req, file, callback) {
+                file.fileID = b32();
+                let extension;
+                if      (file.mimetype == "image/jpeg") extension = ".jpg";
+                else if (file.mimetype == "image/png") extension = ".png";
+                else res.err = "wrongExt";
+                callback(null, file.fileID+extension);
+            }
+        }),
+        limits: {
+            fileSize: fileSize
+        }
+    });
+}
+const imageUpload = multerUpload("images/", 30*1000*1000);
 
 module.exports = (app) => {
 
     app.post("/upload", (req, res) => {
+        let errors = [];
+        function sendResponse() {
+            res.json({
+                errors: errors,
+                redirect: req.query.redirect || "/",
+            });
+        }
+
         if (res.locals.loggedIn) {
-            let errors = [];
             upload.array("image", 1)(req, res, function(err) {
                 if (err) {
                     // error when uploading
@@ -50,6 +79,19 @@ module.exports = (app) => {
                 let title = req.body.title;
                 let description = req.body.description;
                 let tags = JSON.parse(req.body.tags);
+
+                new Image({
+                    userID: res.locals.userID,
+                    filename: req.files[0].filename,
+                    fileID: req.files[0].filename,
+                    title: title,
+                    description: description,
+                    tags: tags,
+                }).save((err) => {
+                    if (err) errors.push("unknown 5");
+                    sendResponse();
+                });
+
 
             });
         }

@@ -1,0 +1,28 @@
+header.profile-header
+    display: flex
+    justify-content: center
+    align-items: center
+    margin: 50px 0px
+    img.profile-image
+        width: 150px
+        height: 150px
+    .profile-container
+        width: 500px
+        margin-left: 50px
+        p.displayname
+            font-size: 32px
+.images-container
+    display: flex
+    $image-spacing: 24px
+    .column
+        width: 100%
+        margin-right: $image-spacing
+        &:first-child
+            margin-left: $image-spacing
+        .image
+            width: 100%
+            margin-bottom: $image-spacing
+            img
+                width: 100%
+    .sample-image
+        display: none

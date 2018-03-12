@@ -76,24 +76,27 @@ fold("upload form", () => {
         }
 
         // setup
-        // const setupEvents = "drag dragstart dragend dragover dragenter dragleave drop";
-        const setupEvents = "dragover dragenter dragleave drop";
+        const setupEvents = "drag dragstart dragend dragover dragenter dragleave drop";
         $(window).on(setupEvents, (e) => {
-            if (containsAFile(e)) {
-                e.preventDefault();
-                e.stopPropagation();
-            }
+            e.preventDefault();
+            e.stopPropagation();
         });
-
         function show() {
-            $(".upload-form .select-file").addClass("hidden");
-            $(".upload-form button.files").addClass("file-drag");
             $(".upload-form .drop-to-select-file").removeClass("hidden");
+            if (window.uploadData) {
+                $(".upload-form .main-form").removeClass("hidden");
+            } else {
+                $(".upload-form .select-file").addClass("hidden");
+            }
         }
         function hide() {
-            $(".upload-form .select-file").removeClass("hidden");
-            $(".upload-form button.files").removeClass("file-drag");
             $(".upload-form .drop-to-select-file").addClass("hidden");
+            if (window.uploadData) {
+                $(".upload-form .main-form").removeClass("hidden");
+            } else {
+                $(".upload-form .main-form").addClass("hidden");
+                $(".upload-form .select-file").removeClass("hidden");
+            }
         }
         // show
         $(window).on("dragenter", (e) => {
@@ -101,15 +104,13 @@ fold("upload form", () => {
             if (containsAFile(e)) $(".upload-form .main-form").addClass("hidden");
         });
         // hide
-        $(window).on("dragend dragleave", (e) => {
-            if (window.uploadData) {
-                $(".upload-form .main-form").removeClass("hidden");
-                hide();
-            }
+        $(window).on("dragend", (e) => {
+            hide();
+        });
+        $(window).on("dragleave", (e) => {
             e = e.originalEvent;
-            if (containsAFile(e)) {
-                if (e.type == "dragleave" && e.relatedTarget == null) hide();
-                else if (e.type != "dragleave") hide();
+            if (e.relatedTarget == null) {
+                hide();
             }
         });
         // drop
@@ -135,7 +136,17 @@ fold("upload form", () => {
         function handleFiles(files) {
             window.uploadData = files;
             $(".select-file.container").addClass("hidden");
+
+            const reader = new FileReader();
             $(".upload-form .main-form").removeClass("hidden");
+            reader.onload = (e) => {
+                const url = e.target.result;
+                $(".upload-form .thumbnail").attr("style", `background-image: url("${url}")`);
+                $(".upload-form .thumbnail-container").addClass("visible");
+
+            };
+            reader.readAsDataURL(files[0]);
+
         }
 
     });

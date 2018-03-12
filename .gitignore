@@ -1,3 +1,4 @@
 web/letsencrypt
+web/images
 **/keys.js
 db/db

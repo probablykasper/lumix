@@ -94,7 +94,7 @@ header.site-header {
     padding: 10px 14px;
     border-radius: 5px;
     width: 250px;
-    background-color: #F3F3F3; }
+    background-color: rgba(0, 0, 0, 0.05); }
   header.site-header .right-side-header {
     display: flex;
     align-items: center;
@@ -159,7 +159,7 @@ header.site-header {
             font-size: 15px;
             color: #3F3F3F; }
           header.site-header .right-side-header .account-icon-container .account-box a.account-box-item:hover {
-            background-color: #F3F3F3; }
+            background-color: rgba(0, 0, 0, 0.05); }
 
 html .center-container {
   position: absolute;
@@ -176,11 +176,34 @@ html .center-container {
   html .center-container p.tagline {
     font-size: 16px; }
 
-html .stuff {
-  height: 900px;
-  width: 200px;
-  margin: auto;
-  background-color: #FFA65C; }
+html header.profile-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 50px 0px; }
+  html header.profile-header img.profile-image {
+    width: 150px;
+    height: 150px; }
+  html header.profile-header .profile-container {
+    width: 500px;
+    margin-left: 50px; }
+    html header.profile-header .profile-container p.displayname {
+      font-size: 32px; }
+
+html .images-container {
+  display: flex; }
+  html .images-container .column {
+    width: 100%;
+    margin-right: 24px; }
+    html .images-container .column:first-child {
+      margin-left: 24px; }
+    html .images-container .column .image {
+      width: 100%;
+      margin-bottom: 24px; }
+      html .images-container .column .image img {
+        width: 100%; }
+  html .images-container .sample-image {
+    display: none; }
 
 html .button {
   padding: 12px 8px;
@@ -224,7 +247,7 @@ html .form-container {
       margin-bottom: 15px;
       border-radius: 5px;
       width: 250px;
-      background-color: #F3F3F3; }
+      background-color: rgba(0, 0, 0, 0.05); }
 
 html .form-container.upload-form .container {
   position: absolute;
@@ -241,10 +264,27 @@ html .form-container.upload-form .container {
     pointer-events: none; }
 
 html .form-container.upload-form .main-form {
-  transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1) all; }
+  transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1) all; }
   html .form-container.upload-form .main-form.hidden {
     transform: scale(0.9);
     opacity: 0; }
+
+html .form-container.upload-form .thumbnail-container {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0px;
+  left: 0px;
+  pointer-events: none;
+  opacity: 0;
+  transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1) all; }
+  html .form-container.upload-form .thumbnail-container.visible {
+    opacity: 0.15; }
+  html .form-container.upload-form .thumbnail-container .thumbnail {
+    background-size: cover;
+    background-position: center;
+    width: 100%;
+    height: 100%; }
 
 html .form-container.upload-form input#files {
   display: none; }
@@ -253,7 +293,7 @@ html .form-container.upload-form input.form-field, html .form-container.upload-f
   width: 600px; }
 
 html .form-container.upload-form .tags-box {
-  background-color: #F3F3F3;
+  background-color: rgba(0, 0, 0, 0.05);
   display: flex;
   flex-wrap: wrap;
   padding-bottom: calc(10px - 6px);

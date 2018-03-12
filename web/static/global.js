@@ -75,6 +75,7 @@ $(document).ready(function () {
     __webpack_require__(1);
     __webpack_require__(2);
     __webpack_require__(3);
+    if (page == "user") __webpack_require__(4);
     if (loggedIn) {}
 });
 
@@ -264,24 +265,27 @@ fold("upload form", function () {
         }
 
         // setup
-        // const setupEvents = "drag dragstart dragend dragover dragenter dragleave drop";
-        var setupEvents = "dragover dragenter dragleave drop";
+        var setupEvents = "drag dragstart dragend dragover dragenter dragleave drop";
         $(window).on(setupEvents, function (e) {
-            if (containsAFile(e)) {
-                e.preventDefault();
-                e.stopPropagation();
-            }
+            e.preventDefault();
+            e.stopPropagation();
         });
-
         function show() {
-            $(".upload-form .select-file").addClass("hidden");
-            $(".upload-form button.files").addClass("file-drag");
             $(".upload-form .drop-to-select-file").removeClass("hidden");
+            if (window.uploadData) {
+                $(".upload-form .main-form").removeClass("hidden");
+            } else {
+                $(".upload-form .select-file").addClass("hidden");
+            }
         }
         function hide() {
-            $(".upload-form .select-file").removeClass("hidden");
-            $(".upload-form button.files").removeClass("file-drag");
             $(".upload-form .drop-to-select-file").addClass("hidden");
+            if (window.uploadData) {
+                $(".upload-form .main-form").removeClass("hidden");
+            } else {
+                $(".upload-form .main-form").addClass("hidden");
+                $(".upload-form .select-file").removeClass("hidden");
+            }
         }
         // show
         $(window).on("dragenter", function (e) {
@@ -289,14 +293,13 @@ fold("upload form", function () {
             if (containsAFile(e)) $(".upload-form .main-form").addClass("hidden");
         });
         // hide
-        $(window).on("dragend dragleave", function (e) {
-            if (window.uploadData) {
-                $(".upload-form .main-form").removeClass("hidden");
-                hide();
-            }
+        $(window).on("dragend", function (e) {
+            hide();
+        });
+        $(window).on("dragleave", function (e) {
             e = e.originalEvent;
-            if (containsAFile(e)) {
-                if (e.type == "dragleave" && e.relatedTarget == null) hide();else if (e.type != "dragleave") hide();
+            if (e.relatedTarget == null) {
+                hide();
             }
         });
         // drop
@@ -322,7 +325,15 @@ fold("upload form", function () {
         function handleFiles(files) {
             window.uploadData = files;
             $(".select-file.container").addClass("hidden");
+
+            var reader = new FileReader();
             $(".upload-form .main-form").removeClass("hidden");
+            reader.onload = function (e) {
+                var url = e.target.result;
+                $(".upload-form .thumbnail").attr("style", "background-image: url(\"" + url + "\")");
+                $(".upload-form .thumbnail-container").addClass("visible");
+            };
+            reader.readAsDataURL(files[0]);
         }
     });
 
@@ -384,6 +395,32 @@ fold("upload form", function () {
     $("body").on("click", ".upload-form button.upload", function () {
         upload();
     });
+});
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var req = {
+    userID: pageUserID,
+    skip: 0,
+    limit: null
+};
+xhr(req, "/getUsersImages", function (res, err) {
+    if (err) ; // http status code not 2xx
+    console.log(res);
+    if (res.errors.length == 0) {
+        for (var i = 0; i < res.images.length; i++) {
+            var image = res.images[i];
+            var imageElement = $(".sample-image").clone();
+            imageElement.removeClass("sample-image").addClass("image");
+            imageElement.find("img").attr("src", "/i/" + image.filename);
+            $(".images-container .col-" + i % 3).append(imageElement);
+        }
+    }
 });
 
 /***/ })

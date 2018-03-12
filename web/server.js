@@ -32,6 +32,7 @@ const PORT_SECURE = process.env.PORT_SECURE;
 
     // static content
     app.use("/", express.static(dir("static"), { redirect: false }));
+    app.use("/i/", express.static(dir("images"), { redirect: false }));
     app.use("/", express.static(dir("static/favicon"), { redirect: false }));
 
     const bodyParser = require("body-parser");

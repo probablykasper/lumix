@@ -17,6 +17,8 @@ services:
             - ./web:/usr/src/app
 
     mongo-express:
+        logging:
+            driver: none
         image: mongo-express:0.42
         ports:
             - ${PORT_MONGO_EXPRESS}:${PORT_MONGO_EXPRESS}
@@ -26,8 +28,8 @@ services:
         environment:
             - "ME_CONFIG_OPTIONS_EDITORTHEME=ambiance"
             - "ME_CONFIG_MONGODB_SERVER=db"
-            - "ME_CONFIG_BASICAUTH_USERNAME=user"
-            - "ME_CONFIG_BASICAUTH_PASSWORD=fairly long password"
+            - "ME_CONFIG_BASICAUTH_USERNAME=root"
+            - "ME_CONFIG_BASICAUTH_PASSWORD=123"
 
     db:
         image: mongo:3.6

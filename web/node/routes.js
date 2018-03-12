@@ -2,6 +2,8 @@
 const passport = require("passport");
 const validator = require("validator");
 const User = require("./mongoose-models").User;
+const Image = require("./mongoose-models").Image;
+const check = require("./checks.js");
 const bcrypt = require("bcryptjs");
 
 function render(app, res, pugFile, variables, callback) {
@@ -30,48 +32,67 @@ module.exports = (app) => {
         next();
     });
 
-    function get(path, pugFile, variables = {}) {
-        // "path", "pugFile"
-        // "path", "pugFile", {variables}
-        // "path", "pugFileLoggedIn", "pugFileLoggedOut"
-        let loggedOutPugFile;
-        if (typeof variables === "string") {
-            loggedOutPugFile = variables;
-            variables = {};
-        } else {
-            loggedOutPugFile = pugFile;
-        }
-        app.get(path, (req, res) => {
-            function render(file, callback) {
-                app.render(file, variables, (err, html) => {
-                    if (err) {
-                        callback(err);
-                    } else {
-                        variables.pageHTML = html;
-                        res.render("template", variables);
-                    }
-                });
-            }
-
-            variables.page = pugFile;
-            variables.loggedIn = res.locals.loggedIn;
-            if (res.locals.loggedIn) {
-                variables.displayname = req.user.displayname;
-                variables.username = req.user.username;
-                variables.email = req.user.email;
-                variables.profilePictureURL = req.user.profilePictureURL;
-                render("logged-in/"+pugFile, (err) => {
-                    // logErr(72001, err);
-                    render("logged-out/"+loggedOutPugFile, (err) => {
-                        logErr(72002, err);
-                    });
-                });
+    function render(res, variables, file, callback) {
+        app.render(file, variables, (err, html) => {
+            if (err) {
+                callback(err);
             } else {
-                render("logged-out/"+loggedOutPugFile, (err) => {
-                    res.redirect(`/login?redirect=${path}`);
-                    logErr(72003, err);
-                });
+                variables.pageHTML = html;
+                res.render("template", variables);
             }
+        });
+    }
+    function get(path, pugFileLoggedIn, pugFileLoggedOut, variables = {}) {
+        // "path", "pugFileLoggedIn", "pugFileLoggedOut", optionalvariables
+        // "path", "pugFile", optionalvariables
+        if (typeof pugFileLoggedOut != "string") {
+            variables = pugFileLoggedOut;
+            pugFileLoggedOut = pugFileLoggedIn;
+        }
+
+        let variablesFunction;
+        if (typeof variables == "function") {
+            variablesFunction = variables;
+        } else {
+            variablesFunction = (req, res, callback) => {
+                callback(variables);
+            }
+        }
+
+        app.get(path, (req, res) => {
+
+            variablesFunction(req, res, (variables = {}) => {
+                variables.loggedIn = res.locals.loggedIn;
+                if (res.locals.loggedIn) {
+                    variables.displayname = req.user.displayname;
+                    variables.username = req.user.username;
+                    variables.email = req.user.email;
+                    variables.profilePictureURL = req.user.profilePictureURL;
+                }
+                if (variables.err404) {
+                    pugFileLoggedIn = "404";
+                    pugFileLoggedOut = "404";
+                } else if (variables.err) {
+                    pugFileLoggedIn = "err";
+                    pugFileLoggedOut = "err";
+                }
+
+                if (res.locals.loggedIn) {
+                    variables.page = pugFileLoggedIn;
+                    render(res, variables, "logged-in/"+pugFileLoggedIn, (err) => {
+                        variables.page = pugFileLoggedOut;
+                        render(res, variables, "logged-out/"+pugFileLoggedOut, (err) => {
+                            logErr(72002, err);
+                        });
+                    });
+                } else {
+                    variables.page = pugFileLoggedOut;
+                    render(res, variables, "logged-out/"+pugFileLoggedOut, (err) => {
+                        res.redirect(`/login?redirect=${path}`);
+                        logErr(72003, err);
+                    });
+                }
+            });
 
         });
     }
@@ -209,6 +230,32 @@ module.exports = (app) => {
 
     });
 
+    // app.post("/getUsersImages/:userID", (req, res) => {
+    //     const errors = [];
+    //     Image.find({userID:req.params.userID}, (err, resultImages) => {
+    //         res.json({
+    //             errors: errors,
+    //             images: resultImages,
+    //         });
+    //     });
+    // });
+    app.post("/getUsersImages", (req, res) => {
+        const errors = [];
+        Image.find({userID:req.body.userID}, null, {
+            skip: req.body.skip,
+            limit: req.body.limit,
+            sort: {
+                date: -1,
+            },
+        }, (err, resultImages) => {
+            console.log(resultImages);
+            res.json({
+                errors: errors,
+                images: resultImages,
+            });
+        });
+    });
+
     app.get("/logout", (req, res) => {
         req.logout();
         res.redirect("/");
@@ -221,5 +268,45 @@ module.exports = (app) => {
 
     // logged in
     get("/upload", "upload");
+    get("/u/:username", "user", (req, res, callback) => {
+        check.ifUsernameExists(req.params.username).then((user) => {
+            if (user) {
+                callback({
+                    user: user,
+                });
+            } else {
+                callback({
+                    err404: true,
+                });
+            }
+        }).catch((err) => {
+            callback({
+                err: err,
+            });
+        });
+    });
+    // get("/u/:username", "user", (req, res, callback) => {
+    //
+    //     check.ifUsernameExists(req.params.username).then((user) => {
+    //         if (user) {
+    //             Image.find({userID:user._id}, (err, resultImages) => {
+    //                 // console.log(resultImages);
+    //                 callback({
+    //                     user: user,
+    //                     images: resultImages,
+    //                 });
+    //             });
+    //         } else {
+    //             callback({
+    //                 err404: true,
+    //             });
+    //         }
+    //     }).catch((err) => {
+    //         callback({
+    //             err: err,
+    //         });
+    //     });
+    //
+    // });
 
 }
