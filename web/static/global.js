@@ -86,6 +86,12 @@ $(document).ready(function () {
 "use strict";
 
 
+(function ($) {
+    $.fn.inOrIs = function (q) {
+        if (this.parents(q).length || this.filter(q).length) return true;else return false;
+    };
+})(jQuery);
+
 window.loopObject = function (object, callback) {
     var i = 0;
     for (var key in object) {
@@ -267,8 +273,10 @@ fold("upload form", function () {
         // setup
         var setupEvents = "drag dragstart dragend dragover dragenter dragleave drop";
         $(window).on(setupEvents, function (e) {
-            e.preventDefault();
-            e.stopPropagation();
+            if ($(e.target).inOrIs(".upload-form")) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
         });
         function show() {
             $(".upload-form .drop-to-select-file").removeClass("hidden");
@@ -289,16 +297,19 @@ fold("upload form", function () {
         }
         // show
         $(window).on("dragenter", function (e) {
-            if (containsAFile(e)) show();
-            if (containsAFile(e)) $(".upload-form .main-form").addClass("hidden");
+            if ($(e.target).inOrIs(".upload-form")) {
+                if (containsAFile(e)) show();
+                if (containsAFile(e)) $(".upload-form .main-form").addClass("hidden");
+            }
         });
         // hide
         $(window).on("dragend", function (e) {
             hide();
         });
         $(window).on("dragleave", function (e) {
+            console.log(e);
             e = e.originalEvent;
-            if (e.relatedTarget == null) {
+            if (e.relatedTarget == null || $(e.target).hasClass("upload-form")) {
                 hide();
             }
         });
@@ -415,8 +426,9 @@ xhr(req, "/getUsersImages", function (res, err) {
     if (res.errors.length == 0) {
         for (var i = 0; i < res.images.length; i++) {
             var image = res.images[i];
-            var imageElement = $(".sample-image").clone();
+            var imageElement = $("a.sample-image").clone();
             imageElement.removeClass("sample-image").addClass("image");
+            imageElement.attr("href", "/i/" + image.fileID);
             imageElement.find("img").attr("src", "/i/" + image.filename);
             $(".images-container .col-" + i % 3).append(imageElement);
         }

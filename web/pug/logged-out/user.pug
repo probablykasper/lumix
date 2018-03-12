@@ -1,8 +1,11 @@
 header.profile-header
-    img.profile-image(src=user.profilePictureURL)
+    img.profile-image(src= user.profilePictureURL)
     .profile-container
         //- p.displayname=user.displayname
-        p.displayname Andre BenzAndre BenzAndre Benz
+        p.displayname= user.displayname
+        p.followers <span>!{user.followers}</span> followers
+        p.date= "Joined "+user.formattedDate
+        p.bio= user.bio
 .images-container
     //- each image in images
     //-     .image
@@ -10,5 +13,5 @@ header.profile-header
     .column.col-0
     .column.col-1
     .column.col-2
-    .sample-image
+    a.sample-image
         img

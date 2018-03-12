@@ -6,11 +6,23 @@ header.profile-header
     img.profile-image
         width: 150px
         height: 150px
+        align-self: flex-start
     .profile-container
         width: 500px
         margin-left: 50px
         p.displayname
             font-size: 32px
+            margin-bottom: 16px
+        p.followers
+            span
+                font-weight: 500
+            display: inline
+        p.date
+            display: inline
+            margin-left: 64px
+        p.bio
+            margin-top: 16px
+            font-size: 15px
 .images-container
     display: flex
     $image-spacing: 24px
@@ -19,7 +31,8 @@ header.profile-header
         margin-right: $image-spacing
         &:first-child
             margin-left: $image-spacing
-        .image
+        a.image
+            display: block
             width: 100%
             margin-bottom: $image-spacing
             img

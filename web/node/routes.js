@@ -4,6 +4,7 @@ const validator = require("validator");
 const User = require("./mongoose-models").User;
 const Image = require("./mongoose-models").Image;
 const check = require("./checks.js");
+const formatDate = require("./format-date.js");
 const bcrypt = require("bcryptjs");
 
 function render(app, res, pugFile, variables, callback) {
@@ -24,6 +25,7 @@ module.exports = (app) => {
             res.locals.loggedIn = true;
             res.locals.displayName = req.user.displayName;
             res.locals.userID = req.user._id;
+            res.locals.bio = req.user.bio;
             res.locals.transactions = req.transactions;
         }
         else {
@@ -220,7 +222,7 @@ module.exports = (app) => {
                     email: email,
                     password: hashedPassword,
 
-                    profilePictureURL: "http://kasp.io/cdn/logos/kh-logo-aevi.png",
+                    profilePictureURL: "/kglogo.png",
                 }).save((err) => {
                     if (err) errors.push("unknown 5");
                     sendResponse();
@@ -230,15 +232,6 @@ module.exports = (app) => {
 
     });
 
-    // app.post("/getUsersImages/:userID", (req, res) => {
-    //     const errors = [];
-    //     Image.find({userID:req.params.userID}, (err, resultImages) => {
-    //         res.json({
-    //             errors: errors,
-    //             images: resultImages,
-    //         });
-    //     });
-    // });
     app.post("/getUsersImages", (req, res) => {
         const errors = [];
         Image.find({userID:req.body.userID}, null, {
@@ -248,7 +241,6 @@ module.exports = (app) => {
                 date: -1,
             },
         }, (err, resultImages) => {
-            console.log(resultImages);
             res.json({
                 errors: errors,
                 images: resultImages,
@@ -270,6 +262,7 @@ module.exports = (app) => {
     get("/upload", "upload");
     get("/u/:username", "user", (req, res, callback) => {
         check.ifUsernameExists(req.params.username).then((user) => {
+            user.formattedDate = formatDate(user.dateCreated, "MMMM Dth, YYYY");
             if (user) {
                 callback({
                     user: user,
@@ -285,28 +278,5 @@ module.exports = (app) => {
             });
         });
     });
-    // get("/u/:username", "user", (req, res, callback) => {
-    //
-    //     check.ifUsernameExists(req.params.username).then((user) => {
-    //         if (user) {
-    //             Image.find({userID:user._id}, (err, resultImages) => {
-    //                 // console.log(resultImages);
-    //                 callback({
-    //                     user: user,
-    //                     images: resultImages,
-    //                 });
-    //             });
-    //         } else {
-    //             callback({
-    //                 err404: true,
-    //             });
-    //         }
-    //     }).catch((err) => {
-    //         callback({
-    //             err: err,
-    //         });
-    //     });
-    //
-    // });
 
 }

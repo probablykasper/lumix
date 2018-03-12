@@ -83,7 +83,7 @@ module.exports = (app) => {
                 new Image({
                     userID: res.locals.userID,
                     filename: req.files[0].filename,
-                    fileID: req.files[0].filename,
+                    fileID: req.files[0].fileID,
                     title: title,
                     description: description,
                     tags: tags,

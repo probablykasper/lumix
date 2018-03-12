@@ -1,3 +1,10 @@
+(function( $ ){
+    $.fn.inOrIs = function(q) {
+        if (this.parents(q).length || this.filter(q).length) return true;
+        else return false;
+    };
+})(jQuery);
+
 window.loopObject = (object, callback) => {
     let i = 0;
     for (let key in object) {

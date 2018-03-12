@@ -3,16 +3,30 @@ const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
     displayname: String,
+    bio: {
+        type: String,
+        default: "",
+    },
     username: String,
     email: String,
     password: String,
     profilePictureURL: String,
     // images: [imageSchema],
-    dateCreated: { type: Date },
+    dateCreated: {
+        type: Date,
+        default: () => {
+            return Date.now();
+        },
+    },
+    followers: {
+        type: Number,
+        default: 0,
+    }
 });
 
 const imageSchema = new Schema({
     userID: String,
+    fileID: String,
     filename: String,
     title: String,
     description: String,
@@ -20,7 +34,9 @@ const imageSchema = new Schema({
 
     date: {
         type: Date,
-        default: new Date(),
+        default: () => {
+            return Date.now();
+        },
     },
     views: {
         type: Number,

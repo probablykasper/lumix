@@ -78,8 +78,10 @@ fold("upload form", () => {
         // setup
         const setupEvents = "drag dragstart dragend dragover dragenter dragleave drop";
         $(window).on(setupEvents, (e) => {
-            e.preventDefault();
-            e.stopPropagation();
+            if ($(e.target).inOrIs(".upload-form")) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
         });
         function show() {
             $(".upload-form .drop-to-select-file").removeClass("hidden");
@@ -100,16 +102,19 @@ fold("upload form", () => {
         }
         // show
         $(window).on("dragenter", (e) => {
-            if (containsAFile(e)) show();
-            if (containsAFile(e)) $(".upload-form .main-form").addClass("hidden");
+            if ($(e.target).inOrIs(".upload-form")) {
+                if (containsAFile(e)) show();
+                if (containsAFile(e)) $(".upload-form .main-form").addClass("hidden");
+            }
         });
         // hide
         $(window).on("dragend", (e) => {
             hide();
         });
         $(window).on("dragleave", (e) => {
+            console.log(e);
             e = e.originalEvent;
-            if (e.relatedTarget == null) {
+            if (e.relatedTarget == null || $(e.target).hasClass("upload-form")) {
                 hide();
             }
         });

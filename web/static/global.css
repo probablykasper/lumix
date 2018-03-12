@@ -183,12 +183,24 @@ html header.profile-header {
   margin: 50px 0px; }
   html header.profile-header img.profile-image {
     width: 150px;
-    height: 150px; }
+    height: 150px;
+    align-self: flex-start; }
   html header.profile-header .profile-container {
     width: 500px;
     margin-left: 50px; }
     html header.profile-header .profile-container p.displayname {
-      font-size: 32px; }
+      font-size: 32px;
+      margin-bottom: 16px; }
+    html header.profile-header .profile-container p.followers {
+      display: inline; }
+      html header.profile-header .profile-container p.followers span {
+        font-weight: 500; }
+    html header.profile-header .profile-container p.date {
+      display: inline;
+      margin-left: 64px; }
+    html header.profile-header .profile-container p.bio {
+      margin-top: 16px;
+      font-size: 15px; }
 
 html .images-container {
   display: flex; }
@@ -197,10 +209,11 @@ html .images-container {
     margin-right: 24px; }
     html .images-container .column:first-child {
       margin-left: 24px; }
-    html .images-container .column .image {
+    html .images-container .column a.image {
+      display: block;
       width: 100%;
       margin-bottom: 24px; }
-      html .images-container .column .image img {
+      html .images-container .column a.image img {
         width: 100%; }
   html .images-container .sample-image {
     display: none; }
