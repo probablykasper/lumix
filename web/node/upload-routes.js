@@ -49,6 +49,7 @@ function multerUpload(path, fileSize) {
     });
 }
 const imageUpload = multerUpload("images/", 30*1000*1000);
+const profilePictureUpload = multerUpload("profile-pictures/", 5*1000*1000);
 
 module.exports = (app) => {
 
@@ -91,6 +92,50 @@ module.exports = (app) => {
                     if (err) errors.push("unknown 5");
                     sendResponse();
                 });
+
+
+            });
+        }
+    });
+
+    app.post("/upload-profile-picture", (req, res) => {
+        let errors = [];
+        function sendResponse() {
+            res.json({
+                errors: errors,
+                redirect: req.query.redirect || "/",
+            });
+        }
+
+        if (res.locals.loggedIn) {
+            profilePictureUpload.array("image", 1)(req, res, function(err) {
+                if (err) {
+                    // error when uploading
+                    console.log("ERROR UPLOADING");
+                    console.log(err);
+                    return;
+                }
+                // success
+                console.log("SUCCESS UPLOADING");
+                req.files[0].filename;
+                req.files[0].path;
+                console.log(req.files);
+                console.log(req.body);
+
+                let displayname = req.body.displayname;
+                let bio = req.body.bio;
+
+                // new Image({
+                //     userID: res.locals.userID,
+                //     filename: req.files[0].filename,
+                //     fileID: req.files[0].fileID,
+                //     title: title,
+                //     description: description,
+                //     tags: tags,
+                // }).save((err) => {
+                //     if (err) errors.push("unknown 5");
+                //     sendResponse();
+                // });
 
 
             });

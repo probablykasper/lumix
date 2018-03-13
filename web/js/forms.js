@@ -307,54 +307,18 @@ fold("settings form", () => {
 
     });
 
-    // add tag when comma/enter
-    $("body").on("keypress", ".upload-form input.add-tag", function(e) {
-        if (e.which == 44) e.preventDefault(); // comma
-        if (e.which == 44 || e.which == 13) { // comma || enter
-            const $inputElement = $(this);
-            const value = $(this).val();
-            $inputElement.val(""); // empty the input
-            $(`
-                <div class="tag">
-                <div class="tag-text">${value}</div>
-                <button class="remove-tag">x</div>
-                </div>
-                `).insertBefore($inputElement);
-            }
-        });
-
-    // remove tag button
-    $("body").on("click", ".upload-form .remove-tag", function() {
-        $(this).parent().remove();
-    });
-
-    // clicking the tags-box focuses the add-tag input element
-    $("body").on("click", ".upload-form .tags-box", (e) => {
-        if (e.target == e.currentTarget) {
-            $(".upload-form input.add-tag").focus();
-        }
-    });
-
-    function upload() {
+    function save() {
 
         const data = new FormData();
         data.append("image", uploadData[0], uploadData[0].name);
-        data.append("title", $(".upload-form input.title").val());
-        data.append("description", $(".upload-form textarea.description").val());
-
-        const tagsArray = [];
-        $(".upload-form .tags-box .tag").each((i, obj) => {
-            const tagText = $(obj).find(".tag-text").html();
-            tagsArray.push(tagText);
-        });
-        data.append("tags", JSON.stringify(tagsArray));
+        data.append("displayname", $(".settings-form input.displayname").val());
+        data.append("bio", $(".settings-form textarea.bio").val());
 
         console.log(data.get("image"));
-        console.log(data.get("title"));
-        console.log(data.get("description"));
-        console.log(data.get("tags"));
+        console.log(data.get("displayname"));
+        console.log(data.get("bio"));
 
-        xhr(data, "/upload", {
+        xhr(data, "/upload-profile-picture", {
             contentType: "none",
         }, (res, err) => {
             if (err); // http status code not 2xx
@@ -367,8 +331,8 @@ fold("settings form", () => {
     }
 
     // upload button click
-    $("body").on("click", ".upload-form button.upload", () => {
-        upload();
+    $("body").on("click", ".settings-form button.save", () => {
+        save();
     });
 
 });

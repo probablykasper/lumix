@@ -1,4 +1,4 @@
 web/letsencrypt
-web/images
+web/images/*
 **/keys.js
 db/db

@@ -23,10 +23,12 @@ module.exports = (app) => {
     app.all("*", (req, res, next) => {
         if (req.user) {
             res.locals.loggedIn = true;
-            res.locals.displayName = req.user.displayName;
+            res.locals.username = req.user.username;
+            res.locals.displayname = req.user.displayname;
+            res.locals.email = req.user.email;
             res.locals.userID = req.user._id;
             res.locals.bio = req.user.bio;
-            res.locals.transactions = req.transactions;
+            res.locals.profilePictureURL = req.user.profilePictureURL;
         }
         else {
             res.locals.loggedIn = false;
@@ -60,36 +62,38 @@ module.exports = (app) => {
                 callback(variables);
             }
         }
-
         app.get(path, (req, res) => {
-
             variablesFunction(req, res, (variables = {}) => {
                 variables.loggedIn = res.locals.loggedIn;
                 if (res.locals.loggedIn) {
-                    variables.displayname = req.user.displayname;
                     variables.username = req.user.username;
+                    variables.displayname = req.user.displayname;
                     variables.email = req.user.email;
+                    variables.userID = req.user.userID;
+                    variables.bio = req.user.bio;
                     variables.profilePictureURL = req.user.profilePictureURL;
                 }
+                let finalPugFileLoggedIn = pugFileLoggedIn;
+                let finalPugFileLoggedOut = pugFileLoggedOut;
                 if (variables.err404) {
-                    pugFileLoggedIn = "404";
-                    pugFileLoggedOut = "404";
+                    finalPugFileLoggedIn = "404";
+                    finalPugFileLoggedOut = "404";
                 } else if (variables.err) {
-                    pugFileLoggedIn = "err";
-                    pugFileLoggedOut = "err";
+                    finalPugFileLoggedIn = "err";
+                    finalPugFileLoggedOut = "err";
                 }
 
                 if (res.locals.loggedIn) {
-                    variables.page = pugFileLoggedIn;
-                    render(res, variables, "logged-in/"+pugFileLoggedIn, (err) => {
-                        variables.page = pugFileLoggedOut;
-                        render(res, variables, "logged-out/"+pugFileLoggedOut, (err) => {
+                    variables.page = finalPugFileLoggedIn;
+                    render(res, variables, "logged-in/"+finalPugFileLoggedIn, (err) => {
+                        variables.page = finalPugFileLoggedOut;
+                        render(res, variables, "logged-out/"+finalPugFileLoggedOut, (err) => {
                             logErr(72002, err);
                         });
                     });
                 } else {
-                    variables.page = pugFileLoggedOut;
-                    render(res, variables, "logged-out/"+pugFileLoggedOut, (err) => {
+                    variables.page = finalPugFileLoggedOut;
+                    render(res, variables, "logged-out/"+finalPugFileLoggedOut, (err) => {
                         res.redirect(`/login?redirect=${path}`);
                         logErr(72003, err);
                     });
@@ -234,18 +238,6 @@ module.exports = (app) => {
 
     app.post("/getUsersImages", (req, res) => {
         const errors = [];
-        // Image.find({userID:req.body.userID}, null, {
-        //     skip: req.body.skip,
-        //     limit: req.body.limit,
-        //     sort: {
-        //         date: -1,
-        //     },
-        // }, (err, resultImages) => {
-        //     res.json({
-        //         errors: errors,
-        //         images: resultImages,
-        //     });
-        // });
         Image.find({userID:req.body.userID}, null, {
             skip: req.body.skip,
             limit: req.body.limit,
@@ -271,8 +263,8 @@ module.exports = (app) => {
     get("/", "home");
     get("/u/:username", "user", (req, res, callback) => {
         check.ifUsernameExists(req.params.username).then((user) => {
-            user.formattedDate = formatDate(user.dateCreated, "MMMM Dth, YYYY");
             if (user) {
+                user.formattedDate = formatDate(user.dateCreated, "MMMM Dth, YYYY");
                 callback({
                     user: user,
                 });

@@ -340,7 +340,10 @@ html .form-container.settings-form .upload-avatar-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-bottom: 15px; }
+  margin-bottom: 15px;
+  width: 300px;
+  margin-right: auto;
+  margin-left: auto; }
   html .form-container.settings-form .upload-avatar-container .account-icon-thumbnail {
     min-width: 100px;
     width: 100px;
@@ -368,7 +371,10 @@ html .form-container.settings-form .upload-avatar-container {
       html .form-container.settings-form .upload-avatar-container .upload-box .container button.files {
         margin: auto; }
 
-html .form-container.settings-form button.upload {
+html .form-container.settings-form input.form-field, html .form-container.settings-form textarea.form-field {
+  width: 500px; }
+
+html .form-container.settings-form button.save {
   margin: auto; }
 
 html .images-container {
