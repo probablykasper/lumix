@@ -11,12 +11,21 @@ module.exports = (date, format) => {
     // MMMM
     result = result.replace("MMMM", months[date.getMonth()]);
 
-    // Dth
+    // MMM
+    result = result.replace("MMM", months[date.getMonth()].substr(0,3));
+
     let dayOfMonth = date.getDate();
+
+    // Dth
     let th = "th";
-    if (dayOfMonth == 1) th = "st";
-    if (dayOfMonth == 2) th = "nd";
-    if (dayOfMonth == 3) th = "rd";
+    if (dayOfMonth == 1 || dayOfMonth == 21 || dayOfMonth == 31 ) th = "st";
+    if (dayOfMonth == 2 || dayOfMonth == 22 ) th = "nd";
+    if (dayOfMonth == 3 || dayOfMonth == 23 ) th = "rd";
     result = result.replace("Dth", dayOfMonth+th);
+    
+    // D
+    result = result.replace("D", dayOfMonth);
+
+
     return result;
 }

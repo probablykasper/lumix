@@ -25,7 +25,10 @@ const userSchema = new Schema({
 });
 
 const imageSchema = new Schema({
-    userID: String,
+    userID: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+    },
     fileID: String,
     filename: String,
     title: String,

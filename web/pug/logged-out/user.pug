@@ -3,8 +3,9 @@ header.profile-header
     .profile-container
         //- p.displayname=user.displayname
         p.displayname= user.displayname
-        p.followers <span>!{user.followers}</span> followers
-        p.date= "Joined "+user.formattedDate
+        .row
+            p.followers <span>!{user.followers}</span> followers
+            p.date= "Joined "+user.formattedDate
         p.bio= user.bio
 .images-container
     //- each image in images
@@ -13,5 +14,13 @@ header.profile-header
     .column.col-0
     .column.col-1
     .column.col-2
-    a.sample-image
-        img
+    .sample-image
+        a.row.row-left
+            img.profile-picture
+            p.displayname
+        .row.row-right
+            .icon.like
+            .icon.download
+        a.image-link
+            img.image
+        .gradient

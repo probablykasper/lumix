@@ -22,6 +22,7 @@ aside, canvas, footer, header, menu, nav,
 section, audio, video, input, button, textarea {
   color: #3F3F3F;
   font: inherit;
+  line-height: normal;
   margin: 0;
   padding: 0;
   border: 0;
@@ -189,34 +190,19 @@ html header.profile-header {
     width: 500px;
     margin-left: 50px; }
     html header.profile-header .profile-container p.displayname {
-      font-size: 32px;
-      margin-bottom: 16px; }
-    html header.profile-header .profile-container p.followers {
-      display: inline; }
-      html header.profile-header .profile-container p.followers span {
-        font-weight: 500; }
-    html header.profile-header .profile-container p.date {
-      display: inline;
-      margin-left: 64px; }
+      font-size: 32px; }
+    html header.profile-header .profile-container .row {
+      display: flex;
+      margin: 16px 0px; }
+      html header.profile-header .profile-container .row p.followers {
+        display: inline; }
+        html header.profile-header .profile-container .row p.followers span {
+          font-weight: 500; }
+      html header.profile-header .profile-container .row p.date {
+        display: inline;
+        margin-left: 64px; }
     html header.profile-header .profile-container p.bio {
-      margin-top: 16px;
       font-size: 15px; }
-
-html .images-container {
-  display: flex; }
-  html .images-container .column {
-    width: 100%;
-    margin-right: 24px; }
-    html .images-container .column:first-child {
-      margin-left: 24px; }
-    html .images-container .column a.image {
-      display: block;
-      width: 100%;
-      margin-bottom: 24px; }
-      html .images-container .column a.image img {
-        width: 100%; }
-  html .images-container .sample-image {
-    display: none; }
 
 html .button {
   padding: 12px 8px;
@@ -261,6 +247,8 @@ html .form-container {
       border-radius: 5px;
       width: 250px;
       background-color: rgba(0, 0, 0, 0.05); }
+    html .form-container .form input#files {
+      display: none; }
 
 html .form-container.upload-form .container {
   position: absolute;
@@ -298,9 +286,6 @@ html .form-container.upload-form .thumbnail-container {
     background-position: center;
     width: 100%;
     height: 100%; }
-
-html .form-container.upload-form input#files {
-  display: none; }
 
 html .form-container.upload-form input.form-field, html .form-container.upload-form textarea.form-field, html .form-container.upload-form .tags-box {
   width: 600px; }
@@ -350,3 +335,119 @@ html .form-container.upload-form .tags-box {
 
 html .form-container.upload-form button.upload {
   margin: auto; }
+
+html .form-container.settings-form .upload-avatar-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 15px; }
+  html .form-container.settings-form .upload-avatar-container .account-icon-thumbnail {
+    min-width: 100px;
+    width: 100px;
+    height: 100px;
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat; }
+  html .form-container.settings-form .upload-avatar-container .upload-box {
+    width: 100%;
+    height: 100px;
+    position: relative; }
+    html .form-container.settings-form .upload-avatar-container .upload-box .container {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      opacity: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1) all; }
+      html .form-container.settings-form .upload-avatar-container .upload-box .container.hidden {
+        opacity: 0;
+        pointer-events: none; }
+      html .form-container.settings-form .upload-avatar-container .upload-box .container button.files {
+        margin: auto; }
+
+html .form-container.settings-form button.upload {
+  margin: auto; }
+
+html .images-container {
+  display: flex; }
+  html .images-container .column {
+    width: 100%;
+    margin-right: 24px; }
+    html .images-container .column:first-child {
+      margin-left: 24px; }
+    html .images-container .column .image {
+      display: block;
+      width: 100%;
+      margin-bottom: 24px;
+      position: relative; }
+      html .images-container .column .image:hover .row.row-left {
+        opacity: 0.8; }
+      html .images-container .column .image:hover .row.row-right {
+        opacity: 1; }
+      html .images-container .column .image:hover .gradient {
+        opacity: 1; }
+      html .images-container .column .image .icon {
+        background-position: center;
+        background-size: 24px;
+        background-repeat: no-repeat;
+        height: 24px;
+        width: 24px;
+        cursor: pointer; }
+      html .images-container .column .image .row {
+        opacity: 0;
+        transition: 0.15s cubic-bezier(0.4, 0, 0.2, 1) all;
+        display: flex;
+        position: absolute;
+        align-items: center;
+        bottom: 0px;
+        z-index: 1; }
+        html .images-container .column .image .row.row-left {
+          left: 0px;
+          padding: 4px 4px;
+          margin: 8px 8px;
+          opacity: 0;
+          transition: 0.15s cubic-bezier(0.4, 0, 0.2, 1) all; }
+          html .images-container .column .image .row.row-left:hover {
+            opacity: 1; }
+          html .images-container .column .image .row.row-left img.profile-picture {
+            width: 24px;
+            height: 24px; }
+          html .images-container .column .image .row.row-left p.displayname {
+            margin-left: 12px;
+            color: white;
+            font-size: 15px; }
+        html .images-container .column .image .row.row-right {
+          right: 0px; }
+          html .images-container .column .image .row.row-right .like, html .images-container .column .image .row.row-right .download {
+            padding: 4px 4px;
+            margin: 8px 8px; }
+          html .images-container .column .image .row.row-right .like {
+            margin-right: 0px;
+            opacity: 0.8;
+            transition: 0.15s cubic-bezier(0.4, 0, 0.2, 1) all;
+            background-image: url('data:image/svg+xml;utf8,<svg fill="#FFFFFF" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none"/><path d="M16.5 3c-1.74 0-3.41.81-4.5 2.09C10.91 3.81 9.24 3 7.5 3 4.42 3 2 5.42 2 8.5c0 3.78 3.4 6.86 8.55 11.54L12 21.35l1.45-1.32C18.6 15.36 22 12.28 22 8.5 22 5.42 19.58 3 16.5 3zm-4.4 15.55l-.1.1-.1-.1C7.14 14.24 4 11.39 4 8.5 4 6.5 5.5 5 7.5 5c1.54 0 3.04.99 3.57 2.36h1.87C13.46 5.99 14.96 5 16.5 5c2 0 3.5 1.5 3.5 3.5 0 2.89-3.14 5.74-7.9 10.05z"/></svg>'); }
+            html .images-container .column .image .row.row-right .like:hover {
+              opacity: 1; }
+            html .images-container .column .image .row.row-right .like .liked {
+              background-image: url('data:image/svg+xml;utf8,<svg fill="#FFFFFF" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h24v24H0z" fill="none"/><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>'); }
+          html .images-container .column .image .row.row-right .download {
+            margin-left: 0px;
+            opacity: 0.8;
+            background-image: url('data:image/svg+xml;utf8,<svg fill="#FFFFFF" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>'); }
+            html .images-container .column .image .row.row-right .download:hover {
+              opacity: 1; }
+      html .images-container .column .image a.image-link img.image {
+        width: 100%; }
+      html .images-container .column .image .gradient {
+        opacity: 0;
+        position: absolute;
+        pointer-events: none;
+        width: 100%;
+        height: 100%;
+        top: 0px;
+        background-image: linear-gradient(180deg, transparent 0, transparent 60%, rgba(0, 0, 0, 0.3)); }
+  html .images-container .sample-image {
+    display: none; }

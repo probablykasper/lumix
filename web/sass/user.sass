@@ -12,30 +12,15 @@ header.profile-header
         margin-left: 50px
         p.displayname
             font-size: 32px
-            margin-bottom: 16px
-        p.followers
-            span
-                font-weight: 500
-            display: inline
-        p.date
-            display: inline
-            margin-left: 64px
+        .row
+            display: flex
+            margin: 16px 0px
+            p.followers
+                span
+                    font-weight: 500
+                display: inline
+            p.date
+                display: inline
+                margin-left: 64px
         p.bio
-            margin-top: 16px
             font-size: 15px
-.images-container
-    display: flex
-    $image-spacing: 24px
-    .column
-        width: 100%
-        margin-right: $image-spacing
-        &:first-child
-            margin-left: $image-spacing
-        a.image
-            display: block
-            width: 100%
-            margin-bottom: $image-spacing
-            img
-                width: 100%
-    .sample-image
-        display: none

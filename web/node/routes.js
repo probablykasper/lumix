@@ -234,13 +234,25 @@ module.exports = (app) => {
 
     app.post("/getUsersImages", (req, res) => {
         const errors = [];
+        // Image.find({userID:req.body.userID}, null, {
+        //     skip: req.body.skip,
+        //     limit: req.body.limit,
+        //     sort: {
+        //         date: -1,
+        //     },
+        // }, (err, resultImages) => {
+        //     res.json({
+        //         errors: errors,
+        //         images: resultImages,
+        //     });
+        // });
         Image.find({userID:req.body.userID}, null, {
             skip: req.body.skip,
             limit: req.body.limit,
             sort: {
                 date: -1,
             },
-        }, (err, resultImages) => {
+        }).populate("userID").exec((err, resultImages) => {
             res.json({
                 errors: errors,
                 images: resultImages,
@@ -257,9 +269,6 @@ module.exports = (app) => {
     get("/login", "login");
     get("/register", "register");
     get("/", "home");
-
-    // logged in
-    get("/upload", "upload");
     get("/u/:username", "user", (req, res, callback) => {
         check.ifUsernameExists(req.params.username).then((user) => {
             user.formattedDate = formatDate(user.dateCreated, "MMMM Dth, YYYY");
@@ -278,5 +287,10 @@ module.exports = (app) => {
             });
         });
     });
+    get("/i/:image", "image");
+
+    // logged in
+    get("/upload", "upload");
+    get("/settings", "settings");
 
 }

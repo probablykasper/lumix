@@ -1,0 +1,16 @@
+.form-container.settings-form.page-width
+    .form
+        .upload-avatar-container
+            .account-icon-thumbnail(style= 'background-image:url("'+profilePictureURL+'")')
+            .upload-box
+                .select-file.container
+                    button.button.files Select file
+                .drop-to-select-file.container.hidden
+                    p Drop to select the file
+        .main-form
+            input(type="file" name="files" id="files", accept="image/jpeg,image/png")
+            label(for="displayname") Displayname
+            input.form-field.displayname(type="text", name="displayname" id="displayname")
+            label(for="bio") Bio
+            textarea.form-field.auto-resize.bio(type="text", name="bio" id="bio", rows="3")
+            button.button.upload(tabIndex="0") Upload
