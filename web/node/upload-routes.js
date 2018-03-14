@@ -1,5 +1,6 @@
 "use strict";
 const Image = require("./mongoose-models").Image;
+const User = require("./mongoose-models").User;
 
 function b32() {
     const length = 11;
@@ -111,31 +112,28 @@ module.exports = (app) => {
             profilePictureUpload.array("image", 1)(req, res, function(err) {
                 if (err) {
                     // error when uploading
-                    console.log("ERROR UPLOADING");
-                    console.log(err);
+                    errors.push(err);
                     return;
                 }
                 // success
                 console.log("SUCCESS UPLOADING");
-                req.files[0].filename;
-                req.files[0].path;
                 console.log(req.files);
                 console.log(req.body);
+                const updatedUser = {
+                    displayname: req.body.displayname,
+                    bio: req.body.bio,
+                }
+                if (req.files.length == 1) {
+                    updatedUser.profilePictureURL = "/pp/"+req.files[0].filename;
+                }
 
-                let displayname = req.body.displayname;
-                let bio = req.body.bio;
-
-                // new Image({
-                //     userID: res.locals.userID,
-                //     filename: req.files[0].filename,
-                //     fileID: req.files[0].fileID,
-                //     title: title,
-                //     description: description,
-                //     tags: tags,
-                // }).save((err) => {
-                //     if (err) errors.push("unknown 5");
-                //     sendResponse();
-                // });
+                User.findOneAndUpdate({
+                    _id: res.locals.userID
+                }, updatedUser, (err, resultUser) => {
+                    res.json({
+                        errors: errors,
+                    });
+                });
 
 
             });

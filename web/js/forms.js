@@ -310,7 +310,7 @@ fold("settings form", () => {
     function save() {
 
         const data = new FormData();
-        data.append("image", uploadData[0], uploadData[0].name);
+        if (window.uploadData) data.append("image", uploadData[0], uploadData[0].name);
         data.append("displayname", $(".settings-form input.displayname").val());
         data.append("bio", $(".settings-form textarea.bio").val());
 
