@@ -322,7 +322,7 @@ module.exports = (app) => {
             if (user) {
                 user.formattedDate = formatDate(user.dateCreated, "MMMM Dth, YYYY");
                 callback({
-                    user: user,
+                    userPage: user,
                 });
             } else {
                 callback({

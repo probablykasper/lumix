@@ -95,7 +95,7 @@ header.site-header {
     padding: 10px 14px;
     border-radius: 5px;
     width: 250px;
-    background-color: rgba(0, 0, 0, 0.05); }
+    background-color: #F2F2F2; }
   header.site-header .right-side-header {
     display: flex;
     align-items: center;
@@ -160,7 +160,7 @@ header.site-header {
             font-size: 15px;
             color: #3F3F3F; }
           header.site-header .right-side-header .account-icon-container .account-box a.account-box-item:hover {
-            background-color: rgba(0, 0, 0, 0.05); }
+            background-color: #F2F2F2; }
 
 html .center-container {
   display: flex;
@@ -222,6 +222,30 @@ html .button {
     width: 0%;
     border-radius: 5px; }
 
+html .highlighted-button {
+  padding: 12px 20px;
+  background-color: #2F2F2F;
+  border-radius: 5px;
+  color: #E5E5E5;
+  position: relative;
+  display: block; }
+  html .highlighted-button:hover::before {
+    width: 50%; }
+  html .highlighted-button:focus::before {
+    width: 80%;
+    transform: translate(-50%, -2px); }
+  html .highlighted-button::before {
+    content: "";
+    position: absolute;
+    transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1) all;
+    background-color: #CBCBCB;
+    bottom: 0px;
+    transform: translate(-50%, 0px);
+    left: 50%;
+    height: 2px;
+    width: 0%;
+    border-radius: 5px; }
+
 html .form-container {
   position: absolute;
   height: calc(100% - 70px);
@@ -251,7 +275,7 @@ html .form-container {
       margin-bottom: 15px;
       border-radius: 5px;
       width: 250px;
-      background-color: rgba(0, 0, 0, 0.05); }
+      background-color: #F2F2F2; }
     html .form-container .form input#files {
       display: none; }
 
@@ -311,7 +335,7 @@ html .form-container.upload-form input.form-field, html .form-container.upload-f
   width: 600px; }
 
 html .form-container.upload-form .tags-box {
-  background-color: rgba(0, 0, 0, 0.05);
+  background-color: #F2F2F2;
   display: flex;
   flex-wrap: wrap;
   padding-bottom: calc(10px - 6px);
@@ -488,3 +512,16 @@ html .images-container {
         background-image: linear-gradient(180deg, transparent 0, transparent 60%, rgba(0, 0, 0, 0.3)); }
   html .images-container .sample-image {
     display: none; }
+
+html .tab-menu {
+  display: flex;
+  margin-right: auto;
+  margin-left: auto;
+  margin-bottom: 15px; }
+  html .tab-menu .button.tab {
+    margin-right: 10px; }
+  html .tab-menu .right-side {
+    margin-left: auto; }
+
+html .tab-menu.user-page {
+  width: 800px; }

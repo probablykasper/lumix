@@ -1,12 +1,18 @@
 header.profile-header
-    img.profile-image(src= user.profilePictureURL)
+    img.profile-image(src= userPage.profilePictureURL)
     .profile-container
-        //- p.displayname=user.displayname
-        p.displayname= user.displayname
+        p.displayname= userPage.displayname
         .row
-            p.followers <span>!{user.followers}</span> followers
-            p.date= "Joined "+user.formattedDate
-        p.bio= user.bio
+            p.followers <span>!{userPage.followers}</span> followers
+            p.date= "Joined "+userPage.formattedDate
+        p.bio= userPage.bio
+.tab-menu.user-page
+    button.button.tab.images-tab <span>x</span> Images
+    button.button.tab.liked-tab <span>x</span> Liked
+    button.button.tab.collections-tab <span>x</span> Collections
+    button.button.tab.following-tab <span>x</span> Following
+    button.button.tab.followers-tab <span>x</span> Followers
+    button.right-side.highlighted-button.follow Follow
 .images-container
     //- each image in images
     //-     .image
