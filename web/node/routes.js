@@ -67,12 +67,7 @@ module.exports = (app) => {
             variablesFunction(req, res, (variables = {}) => {
                 variables.loggedIn = res.locals.loggedIn;
                 if (res.locals.loggedIn) {
-                    variables.username = req.user.username;
-                    variables.displayname = req.user.displayname;
-                    variables.email = req.user.email;
-                    variables.userID = req.user.userID;
-                    variables.bio = req.user.bio;
-                    variables.profilePictureURL = req.user.profilePictureURL;
+                    variables.user = req.user;
                 }
                 let finalPugFileLoggedIn = pugFileLoggedIn;
                 let finalPugFileLoggedOut = pugFileLoggedOut;
@@ -260,13 +255,15 @@ module.exports = (app) => {
                         $in: [ObjectId(res.locals.userID), "$likes.userID"]
                     },
                 }
-            },
+            }
         ]).exec((err, resultImages) => {
-            console.log(err);
-            console.log(resultImages);
-            res.json({
-                errors: errors,
-                images: resultImages,
+            Image.populate(resultImages, {path: "userID"}, (err, resultImages) => {
+                console.log(err);
+                console.log(resultImages);
+                res.json({
+                    errors: errors,
+                    images: resultImages,
+                });
             });
         });
     });
@@ -279,14 +276,12 @@ module.exports = (app) => {
             likes: {
                 $elemMatch: {
                     userID: res.locals.userID,
-                    // userID: new ObjectId("5aa6f73fed32ce008c93f5c6"),
                 }
             }
         }).exec((err, result) => {
             if (err) {
                 errors.push(err);
                 res.json({errors: errors});
-            // } else if (result.likes.length == 1) { // like exists
             } else {
                 let updatedDocument = {};
                 const likesObject = {
@@ -297,7 +292,7 @@ module.exports = (app) => {
                 if (result.likes.length == 1) { // like exists
                     updatedDocument.$pull = likesObject;
                 } else { // like does not exist
-                    updatedDocument.$push = likesObject
+                    updatedDocument.$push = likesObject;
                 }
                 Image.findOneAndUpdate({
                     fileID: req.body.fileID,
@@ -306,6 +301,7 @@ module.exports = (app) => {
                     console.log(resultImage);
                     res.json({
                         errors: errors,
+                        liked: (result.likes.length != 1),
                     });
                 });
             }

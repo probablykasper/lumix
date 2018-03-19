@@ -7,7 +7,13 @@ $("body").on("click", ".image .icon.like", (e) => {
         if (err); // http status code not 2xx
         console.log(res);
         if (res.errors.length == 0) {
-            console.log("success liking");
+            if (res.liked) {
+                console.log("success liking");
+                $(e.target).addClass("liked");
+            } else {
+                console.log("success unliking");
+                $(e.target).removeClass("liked");
+            }
         }
     });
 });

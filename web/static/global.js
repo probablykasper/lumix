@@ -205,7 +205,13 @@ $("body").on("click", ".image .icon.like", function (e) {
         if (err) ; // http status code not 2xx
         console.log(res);
         if (res.errors.length == 0) {
-            console.log("success liking");
+            if (res.liked) {
+                console.log("success liking");
+                $(e.target).addClass("liked");
+            } else {
+                console.log("success unliking");
+                $(e.target).removeClass("liked");
+            }
         }
     });
 });
@@ -566,6 +572,9 @@ xhr(req, "/getUsersImages", function (res, err) {
             imageElement.find("img.image").attr("src", "/i/" + image.filename);
             imageElement.find("img.profile-picture").attr("src", image.userID.profilePictureURL);
             imageElement.find("a.row-left").attr("href", image.userID.username);
+            if (image.likedByUser) {
+                imageElement.find(".row-right .icon.like").addClass("liked");
+            }
             imageElement.find("p.displayname").html(image.userID.displayname);
             $(".images-container .col-" + i % 3).append(imageElement);
         }

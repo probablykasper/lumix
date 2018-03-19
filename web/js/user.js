@@ -16,6 +16,9 @@ xhr(req, "/getUsersImages", (res, err) => {
             imageElement.find("img.image").attr("src", "/i/"+image.filename);
             imageElement.find("img.profile-picture").attr("src", image.userID.profilePictureURL);
             imageElement.find("a.row-left").attr("href", image.userID.username);
+            if (image.likedByUser) {
+                imageElement.find(".row-right .icon.like").addClass("liked");
+            }
             imageElement.find("p.displayname").html(image.userID.displayname);
             $(".images-container .col-"+i%3).append(imageElement);
         }
