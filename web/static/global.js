@@ -75,7 +75,8 @@ $(document).ready(function () {
     __webpack_require__(1);
     __webpack_require__(2);
     __webpack_require__(3);
-    if (page == "user") __webpack_require__(4);
+    __webpack_require__(4);
+    if (page == "user") __webpack_require__(5);
     if (loggedIn) {}
 });
 
@@ -190,6 +191,27 @@ $("body").on("input", "textarea.auto-resize", function (e) {
 
 /***/ }),
 /* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+$("body").on("click", ".image .icon.like", function (e) {
+    var req = {
+        fileID: $(e.target).parents(".image").attr("data-file-id")
+    };
+    console.log(req);
+    xhr(req, "/like-toggle", function (res, err) {
+        if (err) ; // http status code not 2xx
+        console.log(res);
+        if (res.errors.length == 0) {
+            console.log("success liking");
+        }
+    });
+});
+
+/***/ }),
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -494,13 +516,15 @@ fold("settings form", function () {
         var data = new FormData();
         if (window.uploadData) data.append("image", uploadData[0], uploadData[0].name);
         data.append("displayname", $(".settings-form input.displayname").val());
+        data.append("email", $(".settings-form input.email").val());
         data.append("bio", $(".settings-form textarea.bio").val());
 
         console.log(data.get("image"));
         console.log(data.get("displayname"));
+        console.log(data.get("email"));
         console.log(data.get("bio"));
 
-        xhr(data, "/upload-profile-picture", {
+        xhr(data, "/update-settings", {
             contentType: "none"
         }, function (res, err) {
             if (err) ; // http status code not 2xx
@@ -518,7 +542,7 @@ fold("settings form", function () {
 });
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -537,6 +561,7 @@ xhr(req, "/getUsersImages", function (res, err) {
             var image = res.images[i];
             var imageElement = $(".sample-image").clone();
             imageElement.removeClass("sample-image").addClass("image");
+            imageElement.attr("data-file-id", image.fileID);
             imageElement.find("a.image-link").attr("href", "/i/" + image.fileID);
             imageElement.find("img.image").attr("src", "/i/" + image.filename);
             imageElement.find("img.profile-picture").attr("src", image.userID.profilePictureURL);

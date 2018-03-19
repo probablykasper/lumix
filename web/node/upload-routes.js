@@ -72,11 +72,11 @@ module.exports = (app) => {
                     return;
                 }
                 // success
-                console.log("SUCCESS UPLOADING");
-                req.files[0].filename;
-                req.files[0].path;
-                console.log(req.files);
-                console.log(req.body);
+                // console.log("SUCCESS UPLOADING");
+                // req.files[0].filename;
+                // req.files[0].path;
+                // console.log(req.files);
+                // console.log(req.body);
 
                 let title = req.body.title;
                 let description = req.body.description;
@@ -99,7 +99,7 @@ module.exports = (app) => {
         }
     });
 
-    app.post("/upload-profile-picture", (req, res) => {
+    app.post("/update-settings", (req, res) => {
         let errors = [];
         function sendResponse() {
             res.json({
@@ -116,11 +116,12 @@ module.exports = (app) => {
                     return;
                 }
                 // success
-                console.log("SUCCESS UPLOADING");
-                console.log(req.files);
-                console.log(req.body);
+                // console.log("SUCCESS UPLOADING");
+                // console.log(req.files);
+                // console.log(req.body);
                 const updatedUser = {
                     displayname: req.body.displayname,
+                    email: req.body.email,
                     bio: req.body.bio,
                 }
                 if (req.files.length == 1) {

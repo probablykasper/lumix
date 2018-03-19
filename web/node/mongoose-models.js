@@ -10,7 +10,10 @@ const userSchema = new Schema({
     username: String,
     email: String,
     password: String,
-    profilePictureURL: String,
+    profilePictureURL: {
+        type: String,
+        default: "/default-pp.png",
+    },
     // images: [imageSchema],
     dateCreated: {
         type: Date,
@@ -49,10 +52,18 @@ const imageSchema = new Schema({
         type: Number,
         default: 0,
     },
-    likes: {
-        type: Number,
-        default: 0,
-    },
+    likes: [{
+        userID: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "User",
+        },
+        date: {
+            type: Date,
+            default: () => {
+                return Date.now();
+            },
+        },
+    }],
 });
 
 module.exports = {

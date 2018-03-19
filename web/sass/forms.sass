@@ -11,6 +11,15 @@
     font-size: 15px
     .form
         position: relative
+        .row
+            display: flex
+            width: 500px
+            .field
+                width: 100%
+                &:not(:last-child)
+                    margin-right: calc(15px + 5px + 18px)
+                input
+                    width: calc(100% - 14px*2)
         textarea
             resize: none
         input.form-field, textarea.form-field, .tags-box
@@ -22,7 +31,18 @@
             background-color: $white-dark
         input#files
             display: none
+.form-container.register-form
+    @media (max-height: 500px)
+        position: static
+        height: calc(500px - #{$header-height})
+.form-container.login-form
+    @media (max-height: 400px)
+        position: static
+        height: calc(400px - #{$header-height})
 .form-container.upload-form
+    @media (max-height: 500px)
+        position: static
+        height: calc(500px - #{$header-height})
     .container
         position: absolute
         width: 100%
@@ -106,6 +126,9 @@
     button.upload
         margin: auto
 .form-container.settings-form
+    @media (max-height: 500px)
+        position: static
+        height: calc(500px - #{$header-height})
     .upload-avatar-container
         display: flex
         justify-content: center
@@ -115,6 +138,7 @@
         margin-right: auto
         margin-left: auto
         .account-icon-thumbnail
+            pointer-events: none
             min-width: 100px
             width: 100px
             height: 100px
@@ -122,6 +146,7 @@
             background-size: contain
             background-repeat: no-repeat
         .upload-box
+            pointer-events: none
             width: 100%
             height: 100px
             position: relative
@@ -140,7 +165,13 @@
                     pointer-events: none
                 button.files
                     margin: auto
+            .container.select-file
+                button.files
+                    pointer-events: all
+            .container.select-file.hidden
+                button.files
+                    pointer-events: none
     input.form-field, textarea.form-field
-        width: 500px
+        width: calc(500px - 14px*2)
     button.save
         margin: auto

@@ -1,6 +1,7 @@
 "use strict";
 const passport = require("passport");
 const validator = require("validator");
+const ObjectId = require("mongoose").Types.ObjectId;
 const User = require("./mongoose-models").User;
 const Image = require("./mongoose-models").Image;
 const check = require("./checks.js");
@@ -225,8 +226,6 @@ module.exports = (app) => {
                     username: username,
                     email: email,
                     password: hashedPassword,
-
-                    profilePictureURL: "/kglogo.png",
                 }).save((err) => {
                     if (err) errors.push("unknown 5");
                     sendResponse();
@@ -238,17 +237,78 @@ module.exports = (app) => {
 
     app.post("/getUsersImages", (req, res) => {
         const errors = [];
-        Image.find({userID:req.body.userID}, null, {
-            skip: req.body.skip,
-            limit: req.body.limit,
-            sort: {
-                date: -1,
+        Image.aggregate([
+            {
+                $match: {
+                    userID: ObjectId(req.body.userID),
+                },
             },
-        }).populate("userID").exec((err, resultImages) => {
+            {
+                $sort: {
+                    date: -1,
+                },
+            },
+            {
+                $skip: req.body.skip,
+            },
+            {
+                $addFields: {
+                    likeCount: {
+                        $size: "$likes",
+                    },
+                    likedByUser: {
+                        $in: [ObjectId(res.locals.userID), "$likes.userID"]
+                    },
+                }
+            },
+        ]).exec((err, resultImages) => {
+            console.log(err);
+            console.log(resultImages);
             res.json({
                 errors: errors,
                 images: resultImages,
             });
+        });
+    });
+
+    app.post("/like-toggle", (req, res) => {
+        const errors = [];
+        Image.findOne({
+            fileID: req.body.fileID,
+        }).select({
+            likes: {
+                $elemMatch: {
+                    userID: res.locals.userID,
+                    // userID: new ObjectId("5aa6f73fed32ce008c93f5c6"),
+                }
+            }
+        }).exec((err, result) => {
+            if (err) {
+                errors.push(err);
+                res.json({errors: errors});
+            // } else if (result.likes.length == 1) { // like exists
+            } else {
+                let updatedDocument = {};
+                const likesObject = {
+                    likes: {
+                        userID: res.locals.userID,
+                    }
+                };
+                if (result.likes.length == 1) { // like exists
+                    updatedDocument.$pull = likesObject;
+                } else { // like does not exist
+                    updatedDocument.$push = likesObject
+                }
+                Image.findOneAndUpdate({
+                    fileID: req.body.fileID,
+                }, updatedDocument, (err, resultImage) => {
+                    console.log(err);
+                    console.log(resultImage);
+                    res.json({
+                        errors: errors,
+                    });
+                });
+            }
         });
     });
 

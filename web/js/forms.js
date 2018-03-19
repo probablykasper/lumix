@@ -312,13 +312,15 @@ fold("settings form", () => {
         const data = new FormData();
         if (window.uploadData) data.append("image", uploadData[0], uploadData[0].name);
         data.append("displayname", $(".settings-form input.displayname").val());
+        data.append("email", $(".settings-form input.email").val());
         data.append("bio", $(".settings-form textarea.bio").val());
 
         console.log(data.get("image"));
         console.log(data.get("displayname"));
+        console.log(data.get("email"));
         console.log(data.get("bio"));
 
-        xhr(data, "/upload-profile-picture", {
+        xhr(data, "/update-settings", {
             contentType: "none",
         }, (res, err) => {
             if (err); // http status code not 2xx

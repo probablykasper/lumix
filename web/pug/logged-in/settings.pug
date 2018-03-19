@@ -9,8 +9,14 @@
                     p Drop to select the file
         .main-form
             input(type="file" name="files" id="files", accept="image/jpeg,image/png")
-            label(for="displayname") Displayname
-            input.form-field.displayname(type="text", name="displayname" id="displayname" value=displayname)
-            label(for="bio") Bio
-            textarea.form-field.auto-resize.bio(type="text" name="bio" id="bio" rows="3")=bio
+            .row
+                .field
+                    label(for="displayname") Displayname
+                    input.form-field.displayname(type="text", name="displayname" id="displayname" value=displayname)
+                .field
+                    label(for="email") Email
+                    input.form-field.email(type="text", name="email" id="email" value=email)
+            .field
+                label(for="bio") Bio
+                textarea.form-field.auto-resize.bio(type="text" name="bio" id="bio" rows="3")=bio
             button.button.save(tabIndex="0") Save

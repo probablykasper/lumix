@@ -11,6 +11,7 @@ xhr(req, "/getUsersImages", (res, err) => {
             const image = res.images[i];
             let imageElement = $(".sample-image").clone();
             imageElement.removeClass("sample-image").addClass("image");
+            imageElement.attr("data-file-id", image.fileID);
             imageElement.find("a.image-link").attr("href", "/i/"+image.fileID);
             imageElement.find("img.image").attr("src", "/i/"+image.filename);
             imageElement.find("img.profile-picture").attr("src", image.userID.profilePictureURL);
