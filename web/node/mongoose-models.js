@@ -21,26 +21,18 @@ const userSchema = new Schema({
             return Date.now();
         },
     },
-    followers: [{
-        userID: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
-        },
-        date: {
-            type: Date,
-            default: () => {
-                return Date.now();
-            },
-        },
-    }],
+    followers: {
+        type: Number,
+        default: 0,
+    },
 });
 
 const imageSchema = new Schema({
-    userID: {
+    userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "User",
     },
-    fileID: String,
+    imageId: String,
     filename: String,
     title: String,
     description: String,
@@ -56,25 +48,47 @@ const imageSchema = new Schema({
         type: Number,
         default: 0,
     },
+    viewed: {
+        type: Number,
+        default: 0,
+    },
     downloads: {
         type: Number,
         default: 0,
     },
-    likes: [{
-        userID: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "User",
+    downloaded: {
+        type: Number,
+        default: 0,
+    },
+    likes: {
+        type: Number,
+        default: 0,
+    },
+    liked: {
+        type: Number,
+        default: 0,
+    },
+});
+
+const likeSchema = new Schema({
+    imageId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Image",
+    },
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+    },
+    date: {
+        type: Date,
+        default: () => {
+            return Date.now();
         },
-        date: {
-            type: Date,
-            default: () => {
-                return Date.now();
-            },
-        },
-    }],
+    },
 });
 
 module.exports = {
     User: mongoose.model("User", userSchema),
     Image: mongoose.model("Image", imageSchema),
+    Like: mongoose.model("Like", likeSchema),
 };

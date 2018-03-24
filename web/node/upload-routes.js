@@ -15,12 +15,12 @@ const storage = multer.diskStorage({
         callback(null, "images/");
     },
     filename: function(req, file, callback) {
-        file.fileID = b32();
+        file.imageId = b32();
         let extension;
         if      (file.mimetype == "image/jpeg") extension = ".jpg";
         else if (file.mimetype == "image/png") extension = ".png";
         else res.err = "wrongExt";
-        callback(null, file.fileID+extension);
+        callback(null, file.imageId+extension);
     }
 });
 const upload = multer({
@@ -36,12 +36,12 @@ function multerUpload(path, fileSize) {
                 callback(null, path);
             },
             filename: function(req, file, callback) {
-                file.fileID = b32();
+                file.imageId = b32();
                 let extension;
                 if      (file.mimetype == "image/jpeg") extension = ".jpg";
                 else if (file.mimetype == "image/png") extension = ".png";
                 else res.err = "wrongExt";
-                callback(null, file.fileID+extension);
+                callback(null, file.imageId+extension);
             }
         }),
         limits: {
@@ -83,9 +83,9 @@ module.exports = (app) => {
                 let tags = JSON.parse(req.body.tags);
 
                 new Image({
-                    userID: res.locals.userID,
+                    userId: res.locals.userId,
                     filename: req.files[0].filename,
-                    fileID: req.files[0].fileID,
+                    imageId: req.files[0].imageId,
                     title: title,
                     description: description,
                     tags: tags,
@@ -129,7 +129,7 @@ module.exports = (app) => {
                 }
 
                 User.findOneAndUpdate({
-                    _id: res.locals.userID
+                    _id: res.locals.userId
                 }, updatedUser, (err, resultUser) => {
                     res.json({
                         errors: errors,
