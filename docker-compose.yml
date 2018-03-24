@@ -10,11 +10,25 @@ services:
             - ${PORT_INSECURE}:${PORT_INSECURE}
             - ${PORT_SECURE}:${PORT_SECURE}
         depends_on:
+            - api
+        restart: on-failure
+        volumes:
+            - ./web:/usr/src/app
+
+    api:
+        build:
+            context: ./api
+            dockerfile: api.Dockerfile
+        env_file:
+            - .env
+        ports:
+            - 4000:4000
+        depends_on:
             - db
             - mongo-express
         restart: on-failure
         volumes:
-            - ./web:/usr/src/app
+            - ./api:/usr/src/app
 
     mongo-express:
         logging:
