@@ -21,7 +21,6 @@ const userSchema = new Schema({
             return Date.now();
         },
     },
-                return Date.now();
     followers: {
         type: Number,
         default: 0,

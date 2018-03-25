@@ -3,6 +3,7 @@ const { buildSchema } = require("graphql");
 const schema = buildSchema(`
     type Query {
         user(userId: String, username: String): User
+        image(imageId: String!): Image
     }
     type User {
         userId: String
@@ -17,15 +18,18 @@ const schema = buildSchema(`
     }
     type Image {
         imageId: String
-        # user(userId: String, username: String): User
+        user: User
         filename: String
         title: String
         description: String
-        # tags:
+        tags: [String]
         date: String
-        # views:
-        # downloads:
-        # likes:
+        views: Int
+        viewed: Int
+        downloads: Int
+        downloaded: Int
+        likes: Int
+        liked: Int
     }
 `);
 

@@ -93,8 +93,6 @@ module.exports = (app) => {
                     if (err) errors.push("unknown 5");
                     sendResponse();
                 });
-
-
             });
         }
     });
