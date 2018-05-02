@@ -7,6 +7,26 @@ app.use("/graphql", expressGQL({
     schema: require("./node/gql-schema"),
     rootValue: require("./node/gql-resolvers"),
     graphiql: true,
+    formatError: error => {
+        if (typeof error.message == "object") {
+            return {
+                message: error.message.message,
+                errors: error.message,
+                locations: error.locations,
+                path: error.path,
+            }
+        }
+        return {
+            message: error.message,
+            locations: error.locations,
+            path: error.path,
+        }
+    },
+    // formatError: error => ({
+    //     message: error.message,
+    //     locations: error.locations,
+    //     path: error.path,
+    // })
 }));
 
 // mongoose

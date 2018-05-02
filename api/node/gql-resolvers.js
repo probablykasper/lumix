@@ -1,5 +1,8 @@
 const db = require("./mongoose-models");
+const validator = require("validator");
+const bcrypt = require("bcryptjs");
 const ObjectId = require("mongoose").Types.ObjectId;
+const gqlError = require("graphql").GraphQLError;
 const parseDate = require("./parse-date");
 
 class UserConnectionFollow {
@@ -149,25 +152,6 @@ class User {
         });
     }
 }
-// KH   5ab6aa70cd70d6008ed0d46a
-// xvx  5ac94ef5c3fd2800075ccb59
-// xx   5ac94f2cc3fd2800075ccb5d
-// new db.Follow({
-//     followedUserId: "5ab6aa70cd70d6008ed0d46a", // KH
-//     userId: "5ac94ef5c3fd2800075ccb59", // xvx
-// }).save();
-// new db.Follow({
-//     followedUserId: "5ab6aa70cd70d6008ed0d46a", // KH
-//     userId: "5ac94f2cc3fd2800075ccb5d", // xx
-// }).save();
-// new db.Follow({
-//     followedUserId: "5ac94ef5c3fd2800075ccb59", // xvx
-//     userId: "5ab6aa70cd70d6008ed0d46a", // KH
-// }).save();
-// new db.Follow({
-//     followedUserId: "5ac94f2cc3fd2800075ccb5d", // xx
-//     userId: "5ab6aa70cd70d6008ed0d46a", // KH
-// }).save();
 
 class Images {
     constructor({userId, skip, limit}) {
@@ -245,13 +229,105 @@ class Image {
     }
 }
 
+// const newUser = require("./new-user");
+function newUser({password, displayname, username, email, bio}) {
+    return new Promise((resolve, reject) => {
+        const errors = [];
+        errors.message = "Some arguments were invalid";
+        errors.add = function(code, message) {
+            errors.push({code: code, message: message});
+        }
+        if (!displayname) displayname = username;
+        username = username.toLowerCase();
+
+        const usernameRegex = new RegExp(/^[a-z0-9]+$/g);
+        if      (validator.isEmpty(username))                       errors.add(0, "The username is empty");
+        else if (!username.match(usernameRegex))                    errors.add(1, "The username must be alphanumeric");
+        else if (!validator.isLength(username, {max: 30}))          errors.add(2, "The username can't be over 30 characters long");
+
+        if      (validator.isEmpty(password))                       errors.add(3, "The password is empty");
+        else if (!validator.isLength(password, {min: 6}))           errors.add(4, "The password needs to be at least 6 characters");
+        else if (!validator.isLength(password, {max: 100}))         errors.add(5, "The password can't be over 100 characters long");
+
+        if      (validator.isEmpty(email))                          errors.add(6, "We need an email");
+        else if (!validator.isEmail(email))                         errors.add(7, "That email ain't valid");
+        else if (!validator.isLength(email, {max: 60}))             errors.add(8, "The email can't be over 60 characters long");
+
+        function checkIfUserExists(email, username, callback) {
+            db.User.findOne({email: email}, (err, resultUser) => {
+                if (err) errors.add(9, "An unknown error occured");
+                else if (resultUser) errors.add(10, "That email already exists");
+                db.User.findOne({username: username}, (err, resultUser) => {
+                    if (err) errors.add(11, "An unknown error occured");
+                    else if (resultUser) errors.add(12, "That username already exists");
+                    callback();
+                });
+            });
+        }
+
+        function generateHash(password, callback) {
+            bcrypt.genSalt(10, (err, salt) => {
+                if (err) return errors.add(13, "An unknown error occured");
+                bcrypt.hash(password, salt, (err, hashedPassword) => {
+                    if (err) return errors.add(13, "An unknown error occured");
+                    callback(hashedPassword);
+                });
+            });
+        }
+
+        if (errors.length != 0) return reject(new gqlError(errors));
+        checkIfUserExists(email, username, () => {
+            if (errors.length != 0) return reject(new gqlError(errors));
+            generateHash(password, hashedPassword => {
+                if (errors.length != 0) return reject(new gqlError(errors));
+                new db.User({
+                    displayname: displayname,
+                    username: username,
+                    email: email,
+                    password: hashedPassword,
+                }).save(err => {
+                    if (err) errors.add(14, "An unknown error occured");
+                    if (errors.length != 0) return reject(new gqlError(errors));
+                    resolve(new User({
+                        username: username,
+                    }))
+                });
+            })
+        });
+    });
+}
+
 const root = {
     user: (args) => {
         return new User(args);
     },
     image: (args) => {
         return new Image(args);
-    }
+    },
+
+    newUser: newUser,
 }
 
 module.exports = root;
+
+
+
+// KH   5ab6aa70cd70d6008ed0d46a
+// xvx  5ac94ef5c3fd2800075ccb59
+// xx   5ac94f2cc3fd2800075ccb5d
+// new db.Follow({
+//     followedUserId: "5ab6aa70cd70d6008ed0d46a", // KH
+//     userId: "5ac94ef5c3fd2800075ccb59", // xvx
+// }).save();
+// new db.Follow({
+//     followedUserId: "5ab6aa70cd70d6008ed0d46a", // KH
+//     userId: "5ac94f2cc3fd2800075ccb5d", // xx
+// }).save();
+// new db.Follow({
+//     followedUserId: "5ac94ef5c3fd2800075ccb59", // xvx
+//     userId: "5ab6aa70cd70d6008ed0d46a", // KH
+// }).save();
+// new db.Follow({
+//     followedUserId: "5ac94f2cc3fd2800075ccb5d", // xx
+//     userId: "5ab6aa70cd70d6008ed0d46a", // KH
+// }).save();

@@ -2,10 +2,24 @@ const { buildSchema } = require("graphql");
 
 const schema = buildSchema(`
 
-    "Am OSO-8601 encoded UTC date string."
+    "An OSO-8601 encoded UTC date string."
     scalar Date
     "Any date accepted by JavaScript."
     scalar DateInput
+
+    type Query {
+        user(userId: ID, username: String): User
+        image(imageId: ID!): Image
+    }
+    type Mutation {
+        newUser(
+            password: String!
+            displayname: String
+            username: String!
+            email: String!
+            bio: String
+        ): User
+    }
 
     type UserConnection {
         list: [User]
@@ -16,10 +30,6 @@ const schema = buildSchema(`
         # hasLaterDates: Boolean
     }
 
-    type Query {
-        user(userId: ID, username: String): User
-        image(imageId: ID!): Image
-    }
     type User {
         userId: ID
         displayname: String
