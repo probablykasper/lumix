@@ -6,19 +6,27 @@ const schema = buildSchema(`
     scalar Date
     "Any date accepted by JavaScript."
     scalar DateInput
+    "A JSON Web Token."
+    scalar JWT
 
     type Query {
         user(userId: ID, username: String): User
         image(imageId: ID!): Image
+        loggedIn: Boolean
+        viewer: User
     }
     type Mutation {
-        newUser(
+        createUser(
             password: String!
             displayname: String
             username: String!
             email: String!
             bio: String
         ): User
+        login(
+            usernameOrEmail: String
+            password: String!
+        ): JWT
     }
 
     type UserConnection {

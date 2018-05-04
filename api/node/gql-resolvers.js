@@ -1,9 +1,21 @@
 const db = require("./mongoose-models");
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 const ObjectId = require("mongoose").Types.ObjectId;
 const gqlError = require("graphql").GraphQLError;
 const parseDate = require("./parse-date");
+const validate = require("./validate");
+const keys = require("./keys");
+
+function newErrorArray() {
+    const errors = [];
+    errors.message = "Some arguments were invalid";
+    errors.add = function(code, message) {
+        errors.push({code: code, message: message});
+    }
+    return errors;
+}
 
 class UserConnectionFollow {
     constructor(userConnectionType, {userId, before, after, limit}) {
@@ -229,29 +241,21 @@ class Image {
     }
 }
 
-// const newUser = require("./new-user");
-function newUser({password, displayname, username, email, bio}) {
+function createUser({password, displayname, username, email, bio}) {
     return new Promise((resolve, reject) => {
-        const errors = [];
-        errors.message = "Some arguments were invalid";
-        errors.add = function(code, message) {
-            errors.push({code: code, message: message});
-        }
+        const errors = newErrorArray("Some arguments were invalid");
         if (!displayname) displayname = username;
         username = username.toLowerCase();
 
-        const usernameRegex = new RegExp(/^[a-z0-9]+$/g);
-        if      (validator.isEmpty(username))                       errors.add(0, "The username is empty");
-        else if (!username.match(usernameRegex))                    errors.add(1, "The username must be alphanumeric");
-        else if (!validator.isLength(username, {max: 30}))          errors.add(2, "The username can't be over 30 characters long");
-
-        if      (validator.isEmpty(password))                       errors.add(3, "The password is empty");
-        else if (!validator.isLength(password, {min: 6}))           errors.add(4, "The password needs to be at least 6 characters");
-        else if (!validator.isLength(password, {max: 100}))         errors.add(5, "The password can't be over 100 characters long");
-
-        if      (validator.isEmpty(email))                          errors.add(6, "We need an email");
-        else if (!validator.isEmail(email))                         errors.add(7, "That email ain't valid");
-        else if (!validator.isLength(email, {max: 60}))             errors.add(8, "The email can't be over 60 characters long");
+        validate.username(username, (code, message) => {
+            errors.add(code, message);
+        });
+        validate.password(password, (code, message) => {
+            errors.add(code, message);
+        });
+        validate.email(email, (code, message) => {
+            errors.add(code, message);
+        });
 
         function checkIfUserExists(email, username, callback) {
             db.User.findOne({email: email}, (err, resultUser) => {
@@ -269,7 +273,7 @@ function newUser({password, displayname, username, email, bio}) {
             bcrypt.genSalt(10, (err, salt) => {
                 if (err) return errors.add(13, "An unknown error occured");
                 bcrypt.hash(password, salt, (err, hashedPassword) => {
-                    if (err) return errors.add(13, "An unknown error occured");
+                    if (err) return errors.add(14, "An unknown error occured");
                     callback(hashedPassword);
                 });
             });
@@ -290,24 +294,65 @@ function newUser({password, displayname, username, email, bio}) {
                     if (errors.length != 0) return reject(new gqlError(errors));
                     resolve(new User({
                         username: username,
-                    }))
+                    }));
                 });
             })
         });
     });
 }
 
+function login({usernameOrEmail, password}) {
+    return new Promise((resolve, reject) => {
+        db.User.findOne({
+            $or: [
+                {email: usernameOrEmail},
+                {username: usernameOrEmail.toLowerCase()},
+            ],
+        }, (err, resultUser) => {
+            if (err) {
+                reject("An unknown error occured");
+            } else if (!resultUser) {
+                reject("No user has that username or email");
+            } else if (resultUser) {
+                if (password == "123") {
+                    const token = jwt.sign(
+                        {
+                            userId: resultUser._id,
+                        },
+                        keys.jsonWebTokenSecret,
+                        {
+                            expiresIn: "1y",
+                        }
+                    );
+                    resolve(token);
+                } else {
+                    reject("Incorrect password");
+                }
+            }
+        });
+    });
+
+}
+
 const root = {
     user: (args) => {
         return new User(args);
+    },
+    loggedIn: (args, context) => {
+        if (context.loggedIn) return true;
+        else return false;
+    },
+    viewer: (args, context) => {
+        // if (!context.loggedIn) return 
+        return new User({userId: context.userId});
     },
     image: (args) => {
         return new Image(args);
     },
 
-    newUser: newUser,
+    createUser: createUser,
+    login: login,
 }
-
 module.exports = root;
 
 

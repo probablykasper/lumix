@@ -1,11 +1,33 @@
 const express = require("express");
 const expressGQL = require("express-graphql");
+const jwt = require("jsonwebtoken");
+const keys = require("./node/keys");
 
 const app = express();
 
-app.use("/graphql", expressGQL({
+app.use(async (req, res) => {
+    req.userId = null;
+    req.loggedIn = false;
+    const token = req.headers.authentication;
+    try {
+        if (token) {
+            const {userId} = await jwt.verify(token, keys.jsonWebTokenSecret)
+            req.userId = userId;
+            req.loggedIn = true;
+        }
+    } catch(err) {
+        console.log(err);
+    }
+    req.next();
+});
+
+app.use("/graphql", expressGQL((req, res) => ({
     schema: require("./node/gql-schema"),
     rootValue: require("./node/gql-resolvers"),
+    context: {
+        userId: req.userId,
+        loggedIn: req.loggedIn,
+    },
     graphiql: true,
     formatError: error => {
         if (typeof error.message == "object") {
@@ -27,7 +49,7 @@ app.use("/graphql", expressGQL({
     //     locations: error.locations,
     //     path: error.path,
     // })
-}));
+})));
 
 // mongoose
 let retryTime;
@@ -52,8 +74,9 @@ function mongooseConnect() {
     });
 }
 mongooseConnect();
+
 // If the Node process ends, close the Mongoose connection
-process.on('SIGINT', () => {
+process.on("SIGINT", () => {
     mongoose.connection.close(() => {
         console.log("Mongoose successfully disconnected");
         process.exit(0);
