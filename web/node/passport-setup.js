@@ -40,7 +40,7 @@ module.exports = (app, mongoose) => {
         secret: keys.passportSessionStoreSecret,
         store: new MongoStore({
             mongooseConnection: mongoose.connection,
-            ttl: 60*60*24*90,
+            ttl: 60*60*24*365,
             touchAfter: 60*60*24
         }),
         resave: false,

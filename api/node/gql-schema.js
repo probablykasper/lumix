@@ -24,9 +24,12 @@ const schema = buildSchema(`
             bio: String
         ): User
         login(
-            usernameOrEmail: String
+            usernameOrEmail: String!
             password: String!
         ): JWT
+        likeImage(
+            imageId: String!
+        ): Boolean
     }
 
     type UserConnection {

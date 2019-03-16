@@ -1,3 +1,4 @@
+Error.stackTraceLimit = 50;
 const db = require("./mongoose-models");
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
@@ -53,7 +54,7 @@ class UserConnectionFollow {
                 if (docs) {
                     resolve(docs);
                 } else {
-                    reject("Unknown error returning users");
+                    reject();
                 }
             }, (err) => {
                 reject();
@@ -310,7 +311,7 @@ function login({usernameOrEmail, password}) {
             ],
         }, (err, resultUser) => {
             if (err) {
-                reject("An unknown error occured");
+                reject();
             } else if (!resultUser) {
                 reject("No user has that username or email");
             } else if (resultUser) {
@@ -334,6 +335,9 @@ function login({usernameOrEmail, password}) {
 
 }
 
+function requireLogin(context) {
+    if (!context.loggedIn) throw Error(3000);
+}
 const root = {
     user: (args) => {
         return new User(args);
@@ -343,7 +347,7 @@ const root = {
         else return false;
     },
     viewer: (args, context) => {
-        // if (!context.loggedIn) return 
+        requireLogin(context);
         return new User({userId: context.userId});
     },
     image: (args) => {
@@ -352,6 +356,21 @@ const root = {
 
     createUser: createUser,
     login: login,
+    likeImage: ({imageId}, context) => {
+        requireLogin(context);
+        return new Promise((resolve, reject) => {
+            console.log(".:_:_.-_:_:..:");
+            console.log(imageId);
+            db.Like.findOne({
+                imageId: imageId,
+            }).exec((err, result) => {
+                console.log(err);
+                if (err) return reject();
+                if (!result) return reject([1002, imageId]);
+                if (result) return resolve();
+            });
+        });
+    }
 }
 module.exports = root;
 

@@ -5,20 +5,20 @@ const keys = require("./node/keys");
 
 const app = express();
 
-app.use(async (req, res) => {
-    req.userId = null;
-    req.loggedIn = false;
+app.use((req, res) => {
     const token = req.headers.authentication;
-    try {
-        if (token) {
-            const {userId} = await jwt.verify(token, keys.jsonWebTokenSecret)
-            req.userId = userId;
-            req.loggedIn = true;
-        }
-    } catch(err) {
-        console.log(err);
+    if (token) {
+        jwt.verify(token, keys.jsonWebTokenSecret, (err, jwtData) => {
+            if (err) {
+                req.userId = null;
+                req.loggedIn = false;
+            } else {
+                req.userId = jwtData.userId;
+                req.loggedIn = true;
+            }
+            req.next();
+        });
     }
-    req.next();
 });
 
 app.use("/graphql", expressGQL((req, res) => ({
@@ -29,26 +29,26 @@ app.use("/graphql", expressGQL((req, res) => ({
         loggedIn: req.loggedIn,
     },
     graphiql: true,
-    formatError: error => {
-        if (typeof error.message == "object") {
-            return {
-                message: error.message.message,
-                errors: error.message,
-                locations: error.locations,
-                path: error.path,
-            }
-        }
-        return {
-            message: error.message,
-            locations: error.locations,
-            path: error.path,
-        }
-    },
-    // formatError: error => ({
-    //     message: error.message,
-    //     locations: error.locations,
-    //     path: error.path,
-    // })
+    formatError: require("./node/errors"),
+    // formatError: (error) => {
+    //     console.log(error);
+    // }
+    // formatError: (error) => {
+    //     let code;
+    //     if (Array.isArray(error.message)) {
+    //         code = error.message[0];
+    //     } else {
+    //         code = error.message;
+    //     }
+    //     const code = error.message;
+    //     const message = require("./node/errors").getMessage(error);
+    //     return {
+    //         message: message,
+    //         code: code,
+    //         locations: error.locations,
+    //         path: error.path,
+    //     }
+    // },
 })));
 
 // mongoose
