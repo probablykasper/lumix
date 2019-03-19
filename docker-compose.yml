@@ -1,0 +1,16 @@
+version: "3.4"
+services:
+    web:
+        build:
+            context: ./web
+            dockerfile: web.Dockerfile
+        env_file:
+            - .env
+        ports:
+            - ${PORT_INSECURE}:${PORT_INSECURE}
+            - ${PORT_SECURE}:${PORT_SECURE}
+        # depends_on:
+        # 	- api
+        restart: on-failure
+        volumes:
+            - ./web:/go/src/app
