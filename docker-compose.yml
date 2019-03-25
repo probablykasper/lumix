@@ -3,14 +3,14 @@ services:
     web:
         build:
             context: ./web
-            dockerfile: web.Dockerfile
+            dockerfile: ${ENV}.Dockerfile
+        command: yarn dev
         env_file:
             - .env
         ports:
-            - ${PORT_INSECURE}:${PORT_INSECURE}
-            - ${PORT_SECURE}:${PORT_SECURE}
-        # depends_on:
-        # 	- api
-        restart: on-failure
+            - "${PORT_INSECURE}:${PORT_INSECURE}"
+            - "${PORT_SECURE}:${PORT_SECURE}"
+            - "3000:3000"
         volumes:
-            - ./web:/go/src/app
+            - ./web:/home/node/app
+            - /home/node/app/node_modules
